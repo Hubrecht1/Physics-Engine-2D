@@ -11,4 +11,10 @@
 	<ItemGroup>
 	  <PackageReference Include="ppy.SDL2-CS" Version="1.0.82" />
 	</ItemGroup>
+	<ItemGroup>
+	  <None Remove="Physics-Engine-Prototype\test\" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Physics-Engine-Prototype\test\" />
+	</ItemGroup>
 </Project>
