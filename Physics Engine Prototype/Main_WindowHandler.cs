@@ -1,5 +1,6 @@
 ﻿using static SDL2.SDL;
 using System;
+using System.Numerics;
 using SDL2;
 
 
@@ -8,11 +9,13 @@ namespace Physics_Engine_Prototype
     public static class Main_Window
     {
         static IntPtr window;
-        static IntPtr renderer;
+        public static IntPtr renderer;
         public static bool running = true;
         public static string windowName = "Physics_Engine_Prototype";
         public static int windowHeight;
         public static int windowWidth;
+
+        public static event Action? DrawShapes;
 
         //public static event EventHandler Draw;
 
@@ -23,8 +26,22 @@ namespace Physics_Engine_Prototype
 
             while (running)
             {
+#if DEBUG
+                UInt64 start = SDL_GetPerformanceCounter();
+
                 PollEvents();
                 Render();
+
+                UInt64 end = SDL_GetPerformanceCounter();
+                float secondsElapsed = (end - start) / (float)SDL_GetPerformanceFrequency();
+                Console.WriteLine(1 / secondsElapsed + " fps");
+
+#else
+
+                PollEvents();
+                Render();
+
+#endif
             }
 
             CleanUp();
@@ -69,7 +86,15 @@ namespace Physics_Engine_Prototype
             {
                 Console.WriteLine($"There was an issue creating the renderer. {SDL_GetError()}");
             }
+
             UpdateWindowSize();
+
+            Main_Renderer.Initialize();
+
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
+
+            Console.WriteLine("Succesfully started " + windowName);
+            Console.ResetColor();
         }
 
 
@@ -124,12 +149,8 @@ namespace Physics_Engine_Prototype
             // Clears the current render surface.
             SDL_RenderClear(renderer);
 
-
-            // Set the color to red before drawing our shape
-            SDL.SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-
-            // Draw a line from top left to bottom right
-            SDL.SDL_RenderDrawLine(renderer, 0, 0, windowWidth, windowHeight);
+            //drawshapes event if not null
+            DrawShapes?.Invoke();
 
             // Switches out the currently presented render surface with the one we just did work on.
             SDL_RenderPresent(renderer);
@@ -143,6 +164,9 @@ namespace Physics_Engine_Prototype
             SDL_DestroyRenderer(renderer);
             SDL_DestroyWindow(window);
             SDL_Quit();
+
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
+            Console.WriteLine("Succesfully closed " + windowName);
         }
 
 
