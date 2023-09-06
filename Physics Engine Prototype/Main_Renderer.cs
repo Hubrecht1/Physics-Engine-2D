@@ -7,6 +7,7 @@ namespace Physics_Engine_Prototype
 {
     public static class Main_Renderer
     {
+
         static ScreenObject simpleRectangle;
         static IntPtr renderer;
         static SDL_Color color = new SDL_Color { r = 30, g = 50, b = 90, a = 100 };
@@ -23,8 +24,6 @@ namespace Physics_Engine_Prototype
 
 
         }
-
-
 
 
         static void Draw()
