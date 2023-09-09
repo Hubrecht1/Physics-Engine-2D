@@ -17,6 +17,13 @@ namespace Physics_Engine_Prototype
 
         public static event Action? DrawShapes;
 
+        static ulong NOW = SDL_GetPerformanceCounter();
+        static ulong LAST = 0;
+
+        public static double deltaTime = 0;
+
+
+
         //public static event EventHandler Draw;
 
         //main loop
@@ -24,12 +31,15 @@ namespace Physics_Engine_Prototype
         {
             Setup();
 
+
             while (running)
             {
+
 #if DEBUG
                 UInt64 start = SDL_GetPerformanceCounter();
 
                 PollEvents();
+                FrameUpdate();
                 Render();
 
                 UInt64 end = SDL_GetPerformanceCounter();
@@ -39,13 +49,32 @@ namespace Physics_Engine_Prototype
 #else
 
                 PollEvents();
+                FrameUpdate():
                 Render();
 
 #endif
+
+
+
             }
 
             CleanUp();
         }
+
+        static void FrameUpdate()
+        {
+            LAST = NOW;
+            NOW = SDL_GetPerformanceCounter();
+
+            deltaTime = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
+
+            float dt = (float)deltaTime;
+            TransformSystem.Update(dt);
+            ScreenObjectSystem.Update(dt);
+
+
+        }
+
 
         /// <summary>
         /// Setup all of the SDL resources we'll need to display a window.
@@ -89,7 +118,9 @@ namespace Physics_Engine_Prototype
 
             UpdateWindowSize();
 
-            Main_Renderer.Initialize();
+            //Main_Renderer.Initialize();
+
+            MyCharacter testobject = new MyCharacter();
 
             Console.ForegroundColor = ConsoleColor.DarkGreen;
 

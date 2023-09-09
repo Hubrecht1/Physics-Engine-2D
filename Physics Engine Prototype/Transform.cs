@@ -9,6 +9,12 @@ namespace Physics_Engine_Prototype
         public Vector2 scale = Vector2.Zero;
         public float rotation = 0;
 
+        public Transform()
+        {
+            TransformSystem.Register(this);
+        }
     }
+
+
 }
 

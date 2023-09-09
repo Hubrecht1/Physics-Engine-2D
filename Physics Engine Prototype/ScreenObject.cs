@@ -16,6 +16,7 @@ namespace Physics_Engine_Prototype
 
         public ScreenObject(Vector2 _screenPosition, int _width, int _height, SDL_Color _color, IntPtr _renderer)
         {
+            ScreenObjectSystem.Register(this);
             renderer = _renderer;
             width = _width;
             height = _height;
@@ -25,8 +26,12 @@ namespace Physics_Engine_Prototype
 
         }
 
-        public virtual void Update(float dt)
+
+
+
+        public override void Update(float dt)
         {
+            Console.WriteLine("itworks");
             SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
             SDL_RenderFillRect(renderer, ref rect);
 
