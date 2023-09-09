@@ -14,15 +14,15 @@ namespace Physics_Engine_Prototype
         SDL_Rect rect;
         IntPtr renderer;
 
-        public ScreenObject(Vector2 _screenPosition, int _width, int _height, SDL_Color _color, IntPtr _renderer)
+        public ScreenObject(int _width, int _height, SDL_Color _color, IntPtr _renderer)
         {
             ScreenObjectSystem.Register(this);
             renderer = _renderer;
             width = _width;
             height = _height;
             color = _color;
-            screenPosition = _screenPosition;
-            rect = new SDL_Rect { x = (int)screenPosition.X, y = (int)screenPosition.Y, w = width, h = height };
+
+            rect = new SDL_Rect { x = 0, y = 0, w = width, h = height };
 
         }
 

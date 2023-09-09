@@ -10,10 +10,10 @@ namespace Physics_Engine_Prototype
         public MyCharacter()
         {
             Transform transform = new Transform();
-            transform.position = Vector2.Zero;
+            transform.position = new Vector2(30, 30);
             AddComponent(transform);
 
-            ScreenObject screenObject = new ScreenObject(new Vector2(30, 30), 30, 30, new SDL_Color { r = 90, g = 0, b = 0, a = 255 }, Main_Window.renderer);
+            ScreenObject screenObject = new ScreenObject(30, 30, new SDL_Color { r = 90, g = 0, b = 0, a = 255 }, Main_Window.renderer);
             AddComponent(screenObject);
 
 

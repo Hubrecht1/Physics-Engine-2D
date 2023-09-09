@@ -15,8 +15,6 @@ namespace Physics_Engine_Prototype
         public static int windowHeight;
         public static int windowWidth;
 
-        public static event Action? DrawShapes;
-
         static ulong NOW = SDL_GetPerformanceCounter();
         static ulong LAST = 0;
 
@@ -39,8 +37,8 @@ namespace Physics_Engine_Prototype
                 UInt64 start = SDL_GetPerformanceCounter();
 
                 PollEvents();
-                FrameUpdate();
                 Render();
+
 
                 UInt64 end = SDL_GetPerformanceCounter();
                 float secondsElapsed = (end - start) / (float)SDL_GetPerformanceFrequency();
@@ -49,8 +47,9 @@ namespace Physics_Engine_Prototype
 #else
 
                 PollEvents();
-                FrameUpdate():
+                
                 Render();
+   
 
 #endif
 
@@ -174,14 +173,15 @@ namespace Physics_Engine_Prototype
         /// </summary>
         static void Render()
         {
+
             // Sets the color that the screen will be cleared with.
             SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
             // Clears the current render surface.
             SDL_RenderClear(renderer);
 
-            //drawshapes event if not null
-            DrawShapes?.Invoke();
+            //updates components for new frame
+            FrameUpdate();
 
             // Switches out the currently presented render surface with the one we just did work on.
             SDL_RenderPresent(renderer);
