@@ -5,11 +5,10 @@ namespace Physics_Engine_Prototype
     {
         public Entity entity;
 
-        public virtual void Update(float dt)
-        {
+        public virtual void Update(float dt) { }
+        public virtual void Initialize() { }
 
 
-        }
     }
 
 }

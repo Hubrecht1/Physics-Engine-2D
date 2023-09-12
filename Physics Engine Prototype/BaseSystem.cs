@@ -12,6 +12,15 @@ namespace Physics_Engine_Prototype
             components.Add(component);
         }
 
+        public static void Initialize()
+        {
+            foreach (T component in components)
+            {
+                component.Initialize();
+            }
+        }
+
+
         public static void Update(float dt)
         {
             foreach (T component in components)

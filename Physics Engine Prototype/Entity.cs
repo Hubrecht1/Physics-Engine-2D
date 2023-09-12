@@ -3,8 +3,6 @@ namespace Physics_Engine_Prototype
 {
     public class Entity
     {
-
-
         public int ID { get; set; }
 
         List<Component> components = new List<Component>();

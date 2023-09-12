@@ -9,10 +9,10 @@ namespace Physics_Engine_Prototype
     {
         int width;
         int height;
-        Vector2 screenPosition;
         SDL_Color color;
         SDL_Rect rect;
         IntPtr renderer;
+        Transform entityTransform;
 
         public ScreenObject(int _width, int _height, SDL_Color _color, IntPtr _renderer)
         {
@@ -26,18 +26,25 @@ namespace Physics_Engine_Prototype
 
         }
 
+        public override void Initialize()
+        {
+            if (entity.GetComponent<Transform>() == null)
+            {
+                Console.Error.WriteLine($"Entity {entity.ID} must contain TransformComponent for screenobjectComponent to work");
 
+            }
+            entityTransform = entity.GetComponent<Transform>();
 
+        }
 
         public override void Update(float dt)
         {
-            Console.WriteLine("itworks");
             SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
             SDL_RenderFillRect(renderer, ref rect);
 
             //updates position
-            rect.x = (int)entity.GetComponent<Transform>().position.X;
-            rect.y = (int)entity.GetComponent<Transform>().position.Y;
+            rect.x = (int)entityTransform.position.X;
+            rect.y = (int)entityTransform.position.Y;
         }
 
 

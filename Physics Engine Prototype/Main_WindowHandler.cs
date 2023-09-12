@@ -15,10 +15,10 @@ namespace Physics_Engine_Prototype
         public static int windowHeight;
         public static int windowWidth;
 
-        static ulong NOW = SDL_GetPerformanceCounter();
-        static ulong LAST = 0;
+        static ulong NOW, LAST;
+        static bool firstFrame = true;
 
-        public static double deltaTime = 0;
+        static float deltaTime = 0;
 
 
 
@@ -33,16 +33,25 @@ namespace Physics_Engine_Prototype
             while (running)
             {
 
+
+                LAST = NOW;
+                NOW = SDL_GetPerformanceCounter();
+
+                deltaTime = (float)((NOW - LAST) / (float)SDL_GetPerformanceFrequency());
+                if (deltaTime > 1000)
+                {
+                    deltaTime = 0;
+                }
+
 #if DEBUG
                 UInt64 start = SDL_GetPerformanceCounter();
 
                 PollEvents();
                 Render();
 
-
                 UInt64 end = SDL_GetPerformanceCounter();
                 float secondsElapsed = (end - start) / (float)SDL_GetPerformanceFrequency();
-                Console.WriteLine(1 / secondsElapsed + " fps");
+                Console.WriteLine($"{1 / secondsElapsed} + fps \n deltaTime:{Math.Round(deltaTime * 1000, 2)}ms");
 
 #else
 
@@ -62,14 +71,13 @@ namespace Physics_Engine_Prototype
 
         static void FrameUpdate()
         {
-            LAST = NOW;
-            NOW = SDL_GetPerformanceCounter();
 
-            deltaTime = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
 
             float dt = (float)deltaTime;
+
             TransformSystem.Update(dt);
             ScreenObjectSystem.Update(dt);
+            RigidBodySystem.Update(dt);
 
 
         }
@@ -117,9 +125,11 @@ namespace Physics_Engine_Prototype
 
             UpdateWindowSize();
 
-            //Main_Renderer.Initialize();
-
+            //enityIsCreated
             MyCharacter testobject = new MyCharacter();
+            //screenobjectcomponents are initialized
+            ScreenObjectSystem.Initialize();
+            RigidBodySystem.Initialize();
 
             Console.ForegroundColor = ConsoleColor.DarkGreen;
 
@@ -173,6 +183,7 @@ namespace Physics_Engine_Prototype
         /// </summary>
         static void Render()
         {
+
 
             // Sets the color that the screen will be cleared with.
             SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
