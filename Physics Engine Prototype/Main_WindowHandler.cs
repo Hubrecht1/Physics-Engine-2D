@@ -18,7 +18,7 @@ namespace Physics_Engine_Prototype
         static ulong NOW, LAST;
         static bool firstFrame = true;
 
-        static float deltaTime = 0;
+        static double deltaTime = 0;
 
 
 
@@ -37,7 +37,7 @@ namespace Physics_Engine_Prototype
                 LAST = NOW;
                 NOW = SDL_GetPerformanceCounter();
 
-                deltaTime = (float)((NOW - LAST) / (float)SDL_GetPerformanceFrequency());
+                deltaTime = ((float)(NOW - LAST) / (float)SDL_GetPerformanceFrequency());
                 if (deltaTime > 1000)
                 {
                     deltaTime = 0;
@@ -51,7 +51,7 @@ namespace Physics_Engine_Prototype
 
                 UInt64 end = SDL_GetPerformanceCounter();
                 float secondsElapsed = (end - start) / (float)SDL_GetPerformanceFrequency();
-                Console.WriteLine($"{1 / secondsElapsed} + fps \n deltaTime:{Math.Round(deltaTime * 1000, 2)}ms");
+                Console.WriteLine($"{1 / secondsElapsed} fps \n deltaTime:{Math.Round(deltaTime * 1000, 2)}ms");
 
 #else
 
@@ -62,23 +62,19 @@ namespace Physics_Engine_Prototype
 
 #endif
 
-
-
             }
 
             CleanUp();
         }
 
-        static void FrameUpdate()
+
+        static void UpdateSystems() //this funtion is called every frame
         {
-
-
             float dt = (float)deltaTime;
 
             TransformSystem.Update(dt);
             ScreenObjectSystem.Update(dt);
             RigidBodySystem.Update(dt);
-
 
         }
 
@@ -192,7 +188,7 @@ namespace Physics_Engine_Prototype
             SDL_RenderClear(renderer);
 
             //updates components for new frame
-            FrameUpdate();
+            UpdateSystems();
 
             // Switches out the currently presented render surface with the one we just did work on.
             SDL_RenderPresent(renderer);

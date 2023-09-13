@@ -11,7 +11,6 @@ namespace Physics_Engine_Prototype
         Vector2 NewPosition = Vector2.Zero;
         float mass;
 
-
         public RigidBody(float _mass)
         {
             RigidBodySystem.Register(this);
@@ -22,14 +21,17 @@ namespace Physics_Engine_Prototype
         public override void Initialize()
         {
             entityTransform = entity.GetComponent<Transform>();
+            ;
         }
+
         public override void Update(float dt)
         {
-            Force += PhysicsConstants.gravityAccelaration * mass;
+            Force += -PhysicsConstants.gravityAccelaration * mass;
             Velocity += Force / mass * dt;
-            NewPosition += Velocity * dt * 1 / PhysicsConstants.pixelSizeInMeters;
+            NewPosition += Velocity * dt * (1 / PhysicsConstants.pixelSizeInMeters);
             Force = Vector2.Zero;
             UpdatePosition();
+
         }
 
         void UpdatePosition()
