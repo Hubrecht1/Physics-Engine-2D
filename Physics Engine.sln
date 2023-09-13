@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 25.0.1705.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Physics Engine Prototype", "Physics Engine Prototype\Physics Engine Prototype.csproj", "{438526AA-7FE3-43A7-9BB0-12C596BDD5BA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Physics Engine 2D", "Physics Engine Prototype\Physics Engine 2D.csproj", "{438526AA-7FE3-43A7-9BB0-12C596BDD5BA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
