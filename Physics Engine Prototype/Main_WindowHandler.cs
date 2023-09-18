@@ -1,8 +1,6 @@
 ﻿using static SDL2.SDL;
 using System;
 using System.Numerics;
-using SDL2;
-
 
 namespace Physics_Engine_Prototype
 {
@@ -19,8 +17,7 @@ namespace Physics_Engine_Prototype
         static bool firstFrame = true;
 
         static double deltaTime = 0;
-
-
+        static uint physicsTPS = 60;
 
         //public static event EventHandler Draw;
 
@@ -73,7 +70,7 @@ namespace Physics_Engine_Prototype
             float dt = (float)deltaTime;
 
             TransformSystem.Update(dt);
-            ScreenObjectSystem.Update(dt);
+            ScreenRectangleSystem.Update(dt);
             RigidBodySystem.Update(dt);
 
         }
@@ -84,6 +81,9 @@ namespace Physics_Engine_Prototype
         /// </summary>
         static void Setup()
         {
+#if DEBUG
+            SDL_SetHint(SDL_HINT_WINDOWS_DISABLE_THREAD_NAMING, "1");
+#endif
             // Initilizes SDL
             if (SDL_Init(SDL_INIT_VIDEO) < 0)
             {
@@ -124,7 +124,7 @@ namespace Physics_Engine_Prototype
             //enityIsCreated
             MyCharacter testobject = new MyCharacter();
             //screenobjectcomponents are initialized
-            ScreenObjectSystem.Initialize();
+            ScreenRectangleSystem.Initialize();
             RigidBodySystem.Initialize();
 
             Console.ForegroundColor = ConsoleColor.DarkGreen;
@@ -171,7 +171,7 @@ namespace Physics_Engine_Prototype
 
         static void UpdateWindowSize()
         {
-            SDL.SDL_GetRendererOutputSize(renderer, out windowWidth, out windowHeight);
+            SDL_GetRendererOutputSize(renderer, out windowWidth, out windowHeight);
 
         }
         /// <summary>
@@ -179,8 +179,6 @@ namespace Physics_Engine_Prototype
         /// </summary>
         static void Render()
         {
-
-
             // Sets the color that the screen will be cleared with.
             SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
@@ -189,6 +187,8 @@ namespace Physics_Engine_Prototype
 
             //updates components for new frame
             UpdateSystems();
+
+            SDLRenderExtentions.DrawCircle(renderer, new Vector2(100, 100), 50, new SDL_Color { r = 50, g = 50, b = 50, a = 255 });
 
             // Switches out the currently presented render surface with the one we just did work on.
             SDL_RenderPresent(renderer);

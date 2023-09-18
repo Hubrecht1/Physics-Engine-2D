@@ -21,14 +21,14 @@ namespace Physics_Engine_Prototype
         public override void Initialize()
         {
             entityTransform = entity.GetComponent<Transform>();
-            ;
+
         }
 
         public override void Update(float dt)
         {
             Force += -PhysicsConstants.gravityAccelaration * mass;
             Velocity += Force / mass * dt;
-            NewPosition += Velocity * dt * (1 / PhysicsConstants.pixelSizeInMeters);
+            NewPosition += Velocity * dt * PhysicsConstants.pixelSizeInMeters;
             Force = Vector2.Zero;
             UpdatePosition();
 

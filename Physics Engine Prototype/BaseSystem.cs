@@ -1,6 +1,5 @@
 ﻿using System;
 
-
 namespace Physics_Engine_Prototype
 {
     public class BaseSystem<T> where T : Component
@@ -9,6 +8,7 @@ namespace Physics_Engine_Prototype
 
         public static void Register(T component)
         {
+
             components.Add(component);
         }
 
@@ -19,7 +19,6 @@ namespace Physics_Engine_Prototype
                 component.Initialize();
             }
         }
-
 
         public static void Update(float dt)
         {

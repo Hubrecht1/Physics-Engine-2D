@@ -5,7 +5,7 @@ using System.Numerics;
 
 namespace Physics_Engine_Prototype
 {
-    public class ScreenObject : Component
+    public class ScreenRectangle : Component
     {
         int width;
         int height;
@@ -14,9 +14,9 @@ namespace Physics_Engine_Prototype
         IntPtr renderer;
         Transform entityTransform;
 
-        public ScreenObject(int _width, int _height, SDL_Color _color, IntPtr _renderer)
+        public ScreenRectangle(int _width, int _height, SDL_Color _color, IntPtr _renderer)
         {
-            ScreenObjectSystem.Register(this);
+            ScreenRectangleSystem.Register(this);
             renderer = _renderer;
             width = _width;
             height = _height;
