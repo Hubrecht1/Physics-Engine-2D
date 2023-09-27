@@ -1,5 +1,5 @@
 ﻿using System;
-namespace Physics_Engine_Prototype
+namespace Physics_Engine
 {
     public class Main_Input
     {

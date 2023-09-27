@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Physics_Engine_Prototype
+namespace Physics_Engine
 {
     public class BaseSystem<T> where T : Component
     {

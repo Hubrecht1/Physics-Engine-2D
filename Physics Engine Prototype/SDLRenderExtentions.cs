@@ -2,7 +2,7 @@
 using static SDL2.SDL;
 
 using System.Numerics;
-namespace Physics_Engine_Prototype
+namespace Physics_Engine
 {
     public static class SDLRenderExtentions
     {
@@ -32,11 +32,6 @@ namespace Physics_Engine_Prototype
             SDL_RenderDrawLine(renderer, old_x, old_y, new_x, new_y);
 
         }
-
-
-
-
-
 
     }
 }

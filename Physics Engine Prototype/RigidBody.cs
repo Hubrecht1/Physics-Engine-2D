@@ -1,20 +1,24 @@
 ﻿using System;
 using System.Numerics;
 
-namespace Physics_Engine_Prototype
+namespace Physics_Engine
 {
     public class RigidBody : Component
     {
-        Transform entityTransform;
-        Vector2 Velocity = Vector2.Zero;
+        public Transform entityTransform;
+        public Vector2 Velocity = Vector2.Zero;
+        public float mass;
+        public float restitution;
+        bool isStatic = false;
+
         Vector2 Force = Vector2.Zero;
         Vector2 NewPosition = Vector2.Zero;
-        float mass;
 
-        public RigidBody(float _mass)
+        public RigidBody(float _mass, float _restitution = 0.1f)
         {
             RigidBodySystem.Register(this);
             mass = _mass;
+            restitution = _restitution;
 
         }
 

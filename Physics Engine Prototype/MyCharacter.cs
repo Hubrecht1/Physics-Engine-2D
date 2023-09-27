@@ -3,7 +3,7 @@ using System.Numerics;
 using SDL2;
 using static SDL2.SDL;
 
-namespace Physics_Engine_Prototype
+namespace Physics_Engine
 {
     public class MyCharacter : Entity
     {
@@ -21,10 +21,6 @@ namespace Physics_Engine_Prototype
 
             RigidBody rigidBody = new RigidBody(1);
             AddComponent(rigidBody);
-
-
-
-
 
 
         }

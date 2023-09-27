@@ -1,25 +1,26 @@
 ﻿using System;
 using System.Numerics;
 
-namespace Physics_Engine_Prototype
+namespace Physics_Engine
 {
     public class CircleCollider : Component
     {
-        Vector2 Center;
-        float radius;
-        RigidBody RigidBody;
+        public float radius;
+        public RigidBody rigidBody;
 
         public CircleCollider(float _radius)
         {
-
+            CollisionSystem.Register(this);
 
         }
 
         public override void Initialize()
         {
-            RigidBody = entity.GetComponent<RigidBody>();
+            rigidBody = entity.GetComponent<RigidBody>();
 
         }
+
+
 
 
 

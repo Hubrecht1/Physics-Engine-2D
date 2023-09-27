@@ -2,14 +2,14 @@
 using System;
 using System.Numerics;
 
-namespace Physics_Engine_Prototype
+namespace Physics_Engine
 {
     public static class Main_Window
     {
         static IntPtr window;
         public static IntPtr renderer;
         public static bool running = true;
-        public static string windowName = "Physics_Engine_Prototype";
+        public static string windowName = "Physics_Engine";
         public static int windowHeight;
         public static int windowWidth;
 
@@ -18,6 +18,8 @@ namespace Physics_Engine_Prototype
 
         static double deltaTime = 0;
         static uint physicsTPS = 60;
+        static uint frameCount = 0;
+        static float totalsecondsElapsed = 0;
 
         //public static event EventHandler Draw;
 
@@ -41,6 +43,7 @@ namespace Physics_Engine_Prototype
                 }
 
 #if DEBUG
+                frameCount++;
                 UInt64 start = SDL_GetPerformanceCounter();
 
                 PollEvents();
@@ -48,7 +51,18 @@ namespace Physics_Engine_Prototype
 
                 UInt64 end = SDL_GetPerformanceCounter();
                 float secondsElapsed = (end - start) / (float)SDL_GetPerformanceFrequency();
-                Console.WriteLine($"{1 / secondsElapsed} fps \n deltaTime:{Math.Round(deltaTime * 1000, 2)}ms");
+
+                totalsecondsElapsed += secondsElapsed;
+
+                if (frameCount % 100 == 0)
+                {
+                    double averageFPS = Math.Round(100 / totalsecondsElapsed, 2);
+                    string line = $"{averageFPS} fps; {Math.Round(1000 / averageFPS, 2)} ms ";
+                    Console.SetCursorPosition(0, Console.CursorTop);
+                    Console.Write(line);
+                    totalsecondsElapsed = 0;
+                }
+
 
 #else
 
@@ -123,9 +137,12 @@ namespace Physics_Engine_Prototype
 
             //enityIsCreated
             MyCharacter testobject = new MyCharacter();
-            //screenobjectcomponents are initialized
+
+            //All Components are initialized
+            TransformSystem.Initialize();
             ScreenRectangleSystem.Initialize();
             RigidBodySystem.Initialize();
+            CollisionSystem.Initialize();
 
             Console.ForegroundColor = ConsoleColor.DarkGreen;
 
@@ -204,7 +221,7 @@ namespace Physics_Engine_Prototype
             SDL_Quit();
 
             Console.ForegroundColor = ConsoleColor.DarkGreen;
-            Console.WriteLine("Succesfully closed " + windowName);
+            Console.WriteLine("\nSuccesfully closed " + windowName);
         }
 
 

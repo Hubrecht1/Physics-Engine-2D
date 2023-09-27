@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Physics_Engine_Prototype
+namespace Physics_Engine
 {
     public class Component
     {
@@ -8,7 +8,6 @@ namespace Physics_Engine_Prototype
 
         public virtual void Update(float dt) { }
         public virtual void Initialize() { }
-
 
     }
 

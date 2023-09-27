@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Numerics;
 
-namespace Physics_Engine_Prototype
+namespace Physics_Engine
 {
     public class Transform : Component
     {

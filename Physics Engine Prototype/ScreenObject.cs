@@ -3,7 +3,7 @@ using System.Drawing;
 using static SDL2.SDL;
 using System.Numerics;
 
-namespace Physics_Engine_Prototype
+namespace Physics_Engine
 {
     public class ScreenRectangle : Component
     {
