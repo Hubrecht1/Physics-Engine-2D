@@ -10,6 +10,7 @@ namespace Physics_Engine
 
         public CircleCollider(float _radius)
         {
+            radius = _radius;
             CollisionSystem.Register(this);
 
         }

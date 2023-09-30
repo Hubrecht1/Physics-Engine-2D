@@ -7,23 +7,53 @@ namespace Physics_Engine
 {
     public class MyCharacter : Entity
     {
-        public MyCharacter()
+        public MyCharacter(int _ID, Vector2 position)
         {
             //example
-            ID = 1;
+            ID = _ID;
 
             Transform transform = new Transform();
-            transform.position = new Vector2(30, 30);
+            transform.position = position;
             AddComponent(transform);
 
-            ScreenRectangle screenObject = new ScreenRectangle(30, 30, new SDL_Color { r = 90, g = 0, b = 0, a = 255 }, Main_Window.renderer);
-            AddComponent(screenObject);
+            ScreenCircle screenCircle = new ScreenCircle(20, new SDL_Color { r = 90, g = 0, b = 0, a = 255 }, Main_Window.renderer);
+            AddComponent(screenCircle);
 
-            RigidBody rigidBody = new RigidBody(1);
+
+
+            RigidBody rigidBody = new RigidBody(5f, 0.5f);
             AddComponent(rigidBody);
 
+            CircleCollider circleCollider = new CircleCollider(20);
+            AddComponent(circleCollider);
 
         }
     }
+
+    public class MycharacterBox : Entity
+    {
+        public MycharacterBox(int _ID, Vector2 position)
+        {
+            ID = _ID;
+
+            Transform transform = new Transform();
+            transform.position = position;
+            AddComponent(transform);
+
+            ScreenRectangle screenObject = new ScreenRectangle(600, 30, new SDL_Color { r = 90, g = 0, b = 0, a = 255 }, Main_Window.renderer);
+            AddComponent(screenObject);
+
+            RigidBody rigidBody = new RigidBody(0, 0.5f);
+            AddComponent(rigidBody);
+
+            BoxCollider boxCollider = new BoxCollider(600, 30);
+            AddComponent(boxCollider);
+
+        }
+
+
+    }
+
+
 }
 

@@ -22,6 +22,7 @@ namespace Physics_Engine
                     return (T)component;
                 }
             }
+            Console.Error.WriteLine($"Enity {ID} couldn't find {typeof(T)} component");
             return null;
         }
     }

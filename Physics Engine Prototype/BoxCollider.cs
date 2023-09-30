@@ -5,14 +5,16 @@ namespace Physics_Engine
 {
     public class BoxCollider : Component
     {
-        public Vector2 min;
-        public Vector2 max;
+        public int width;
+        public int height;
         float rotation;
-        RigidBody rigidBody;
+        public RigidBody rigidBody;
 
-        public BoxCollider(Vector2 _min, Vector2 _max, float _rotation)
+        public BoxCollider(int _width, int _height, float _rotation = 0)
         {
             CollisionSystem.Register(this);
+            width = _width;
+            height = _height;
 
         }
 

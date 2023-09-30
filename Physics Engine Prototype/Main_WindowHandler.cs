@@ -1,4 +1,5 @@
 ﻿using static SDL2.SDL;
+
 using System;
 using System.Numerics;
 
@@ -10,10 +11,10 @@ namespace Physics_Engine
         public static IntPtr renderer;
         public static bool running = true;
         public static string windowName = "Physics_Engine";
-        public static int windowHeight;
-        public static int windowWidth;
+        public static int windowHeight = 600;
+        public static int windowWidth = 600;
 
-        static ulong NOW, LAST;
+        static ulong NOW, LAST = 0;
         static bool firstFrame = true;
 
         static double deltaTime = 0;
@@ -32,12 +33,11 @@ namespace Physics_Engine
             while (running)
             {
 
-
                 LAST = NOW;
                 NOW = SDL_GetPerformanceCounter();
+                deltaTime = (double)(NOW - LAST) / SDL_GetPerformanceFrequency();
 
-                deltaTime = ((float)(NOW - LAST) / (float)SDL_GetPerformanceFrequency());
-                if (deltaTime > 1000)
+                if (LAST == 0)
                 {
                     deltaTime = 0;
                 }
@@ -57,19 +57,18 @@ namespace Physics_Engine
                 if (frameCount % 100 == 0)
                 {
                     double averageFPS = Math.Round(100 / totalsecondsElapsed, 2);
-                    string line = $"{averageFPS} fps; {Math.Round(1000 / averageFPS, 2)} ms ";
+                    string line = $"{averageFPS} fps; {Math.Round(deltaTime * 1000, 2)} ms ";
                     Console.SetCursorPosition(0, Console.CursorTop);
                     Console.Write(line);
                     totalsecondsElapsed = 0;
                 }
 
-
 #else
 
                 PollEvents();
-                
+
                 Render();
-   
+
 
 #endif
 
@@ -85,6 +84,8 @@ namespace Physics_Engine
 
             TransformSystem.Update(dt);
             ScreenRectangleSystem.Update(dt);
+            ScreenCircleSystem.Update(dt);
+            CollisionSystem.Update(dt);
             RigidBodySystem.Update(dt);
 
         }
@@ -109,8 +110,8 @@ namespace Physics_Engine
                 windowName,
                 SDL_WINDOWPOS_UNDEFINED,
                 SDL_WINDOWPOS_UNDEFINED,
-                640,
-                480,
+                windowWidth,
+                windowHeight,
                 SDL_WindowFlags.SDL_WINDOW_SHOWN);
 
             //makes window resizable
@@ -136,11 +137,22 @@ namespace Physics_Engine
             UpdateWindowSize();
 
             //enityIsCreated
-            MyCharacter testobject = new MyCharacter();
+            MyCharacter testobject0 = new MyCharacter(0, new Vector2(60, 30));
+            MyCharacter testobject1 = new MyCharacter(1, new Vector2(200, 30));
+            MyCharacter testobject2 = new MyCharacter(2, new Vector2(200, 50));
+            MyCharacter testobject3 = new MyCharacter(3, new Vector2(250, 50));
+
+            testobject1.GetComponent<RigidBody>().Velocity += new Vector2(-4f, 0);
+            testobject0.GetComponent<RigidBody>().Velocity += new Vector2(4f, 0);
+
+
+            MycharacterBox box = new MycharacterBox(4, new Vector2(0, 500));
 
             //All Components are initialized
             TransformSystem.Initialize();
             ScreenRectangleSystem.Initialize();
+            ScreenCircleSystem.Initialize();
+
             RigidBodySystem.Initialize();
             CollisionSystem.Initialize();
 
@@ -169,7 +181,6 @@ namespace Physics_Engine
                         break;
 
                 }
-
 
             }
         }
@@ -205,7 +216,7 @@ namespace Physics_Engine
             //updates components for new frame
             UpdateSystems();
 
-            SDLRenderExtentions.DrawCircle(renderer, new Vector2(100, 100), 50, new SDL_Color { r = 50, g = 50, b = 50, a = 255 });
+
 
             // Switches out the currently presented render surface with the one we just did work on.
             SDL_RenderPresent(renderer);

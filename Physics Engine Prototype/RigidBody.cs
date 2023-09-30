@@ -7,9 +7,9 @@ namespace Physics_Engine
     {
         public Transform entityTransform;
         public Vector2 Velocity = Vector2.Zero;
+        public float inv_mass;
         public float mass;
         public float restitution;
-        bool isStatic = false;
 
         Vector2 Force = Vector2.Zero;
         Vector2 NewPosition = Vector2.Zero;
@@ -18,6 +18,16 @@ namespace Physics_Engine
         {
             RigidBodySystem.Register(this);
             mass = _mass;
+
+            if (_mass == 0)
+            {
+                inv_mass = 0;
+            }
+            else
+            {
+                inv_mass = 1 / _mass;
+
+            }
             restitution = _restitution;
 
         }
@@ -30,12 +40,16 @@ namespace Physics_Engine
 
         public override void Update(float dt)
         {
+            //if (isStatic)
+            //{
+            //    return;
+            //}
+
             Force += -PhysicsConstants.gravityAccelaration * mass;
-            Velocity += Force / mass * dt;
-            NewPosition += Velocity * dt * PhysicsConstants.pixelSizeInMeters;
+            Velocity += Force * inv_mass * dt;
+            NewPosition += Velocity * dt * PhysicsConstants.inv_pixelSizeInMeters;
             Force = Vector2.Zero;
             UpdatePosition();
-
         }
 
         void UpdatePosition()
