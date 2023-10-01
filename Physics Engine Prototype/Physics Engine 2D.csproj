@@ -10,5 +10,6 @@
 	</PropertyGroup>
 	<ItemGroup>
 	  <PackageReference Include="Ryujinx.SDL2-CS" Version="2.0.14" />
+	  <PackageReference Include="ImGui.NET" Version="1.89.9.2" />
 	</ItemGroup>
 </Project>

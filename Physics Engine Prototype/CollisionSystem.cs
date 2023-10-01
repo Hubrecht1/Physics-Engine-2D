@@ -41,9 +41,8 @@ namespace Physics_Engine
                     Vector2 collisionNormal = Vector2.Zero;
                     if (CirclevsCircle(circleColliders[i], circleColliders[j], ref collisionNormal, ref penetration))
                     {
-
                         ResolveCollision(circleColliders[i].rigidBody, circleColliders[j].rigidBody, collisionNormal);
-                        //PositionalCorrection(circleColliders[i].rigidBody, circleColliders[j].rigidBody, collisionNormal, penetration);
+                        PositionalCorrection(circleColliders[i].rigidBody, circleColliders[j].rigidBody, collisionNormal, penetration);
                     }
                 }
             }
@@ -57,7 +56,7 @@ namespace Physics_Engine
                     if (BoxvsBox(boxColliders[i], boxColliders[j], ref collisionNormal, ref penetration))
                     {
                         ResolveCollision(boxColliders[i].rigidBody, boxColliders[j].rigidBody, collisionNormal);
-                        //PositionalCorrection(boxColliders[i].rigidBody, boxColliders[j].rigidBody, collisionNormal, penetration);
+                        PositionalCorrection(boxColliders[i].rigidBody, boxColliders[j].rigidBody, collisionNormal, penetration);
                     }
                 }
             }
@@ -71,7 +70,7 @@ namespace Physics_Engine
                     if (BoxvsCircle(circleColliders[i], boxColliders[j], ref collisionNormal, ref penetration))
                     {
                         ResolveCollision(circleColliders[i].rigidBody, boxColliders[j].rigidBody, collisionNormal);
-                        //PositionalCorrection(circleColliders[i].rigidBody, boxColliders[j].rigidBody, collisionNormal, penetration);
+                        PositionalCorrection(circleColliders[i].rigidBody, boxColliders[j].rigidBody, collisionNormal, penetration);
                     }
                 }
             }
@@ -80,6 +79,10 @@ namespace Physics_Engine
 
         static void ResolveCollision(RigidBody A, RigidBody B, Vector2 normal)
         {
+            if (A.mass == 0 && B.mass == 0)
+            {
+                return;
+            }
 
             // Calculate relative velocity 
             Vector2 rv = (B.Velocity - A.Velocity);
@@ -116,9 +119,8 @@ namespace Physics_Engine
 
             Vector2 n = bPos - aPos;
             float r = a.radius + b.radius;
-            r *= r;
 
-            if (n.LengthSquared() > r)
+            if (n.LengthSquared() > r * r)
             {
 
                 return false;

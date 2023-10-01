@@ -19,6 +19,8 @@ namespace Physics_Engine
         {
             rigidBody = entity.GetComponent<RigidBody>();
 
+            rigidBody.crossSectionArea = (2 * (radius / PhysicsConstants.inv_pixelSizeInMeters));
+            rigidBody.dragCoefficient = 0.47f;
         }
 
 

@@ -1,5 +1,4 @@
 ﻿using static SDL2.SDL;
-
 using System;
 using System.Numerics;
 
@@ -47,17 +46,21 @@ namespace Physics_Engine
                 UInt64 start = SDL_GetPerformanceCounter();
 
                 PollEvents();
+                float physicsStart = SDL_GetPerformanceCounter();
+                UpdatePhysics();
+                float physicsEnd = SDL_GetPerformanceCounter();
                 Render();
 
                 UInt64 end = SDL_GetPerformanceCounter();
                 float secondsElapsed = (end - start) / (float)SDL_GetPerformanceFrequency();
+                float physicsTimeElapsed = (physicsEnd - physicsStart) / SDL_GetPerformanceFrequency();
 
                 totalsecondsElapsed += secondsElapsed;
 
                 if (frameCount % 100 == 0)
                 {
                     double averageFPS = Math.Round(100 / totalsecondsElapsed, 2);
-                    string line = $"{averageFPS} fps; {Math.Round(deltaTime * 1000, 2)} ms ";
+                    string line = $"(average)fps {averageFPS}; dt: {Math.Round(deltaTime * 1000, 2)} ms; physics: {Math.Round(physicsTimeElapsed * 1000, 2)} ms";
                     Console.SetCursorPosition(0, Console.CursorTop);
                     Console.Write(line);
                     totalsecondsElapsed = 0;
@@ -85,8 +88,7 @@ namespace Physics_Engine
             TransformSystem.Update(dt);
             ScreenRectangleSystem.Update(dt);
             ScreenCircleSystem.Update(dt);
-            CollisionSystem.Update(dt);
-            RigidBodySystem.Update(dt);
+
 
         }
 
@@ -126,7 +128,7 @@ namespace Physics_Engine
             renderer = SDL_CreateRenderer(
                 window,
                 -1,
-                SDL_RendererFlags.SDL_RENDERER_ACCELERATED |
+                SDL_RendererFlags.SDL_RENDERER_ACCELERATED & SDL_RendererFlags.SDL_RENDERER_TARGETTEXTURE |
                 SDL_RendererFlags.SDL_RENDERER_PRESENTVSYNC);
 
             if (renderer == IntPtr.Zero)
@@ -137,17 +139,19 @@ namespace Physics_Engine
             UpdateWindowSize();
 
             //enityIsCreated
-            MyCharacter testobject0 = new MyCharacter(0, new Vector2(60, 30));
-            MyCharacter testobject1 = new MyCharacter(1, new Vector2(200, 30));
-            MyCharacter testobject2 = new MyCharacter(2, new Vector2(200, 50));
+            MyCharacter testobject0 = new MyCharacter(0, new Vector2(300, 30), 10);
+            MyCharacter testobject1 = new MyCharacter(1, new Vector2(100, 100), 40);
+            MyCharacter testobject2 = new MyCharacter(2, new Vector2(200, 50), 5);
             MyCharacter testobject3 = new MyCharacter(3, new Vector2(250, 50));
+            MyCharacter testobject4 = new MyCharacter(7, new Vector2(250, 150), 10);
 
-            testobject1.GetComponent<RigidBody>().Velocity += new Vector2(-4f, 0);
-            testobject0.GetComponent<RigidBody>().Velocity += new Vector2(4f, 0);
+            testobject1.GetComponent<RigidBody>().Velocity += new Vector2(-10f, 0);
+            testobject0.GetComponent<RigidBody>().Velocity += new Vector2(10f, 0);
+            testobject4.GetComponent<RigidBody>().Velocity += new Vector2(0, 0);
 
-
-            MycharacterBox box = new MycharacterBox(4, new Vector2(0, 500));
-
+            MycharacterBox box = new MycharacterBox(4, new Vector2(0, windowHeight), windowWidth, 2);
+            MycharacterBox box1 = new MycharacterBox(5, new Vector2(0, 0), 2, windowHeight);
+            MycharacterBox box2 = new MycharacterBox(6, new Vector2(windowWidth, 0), 2, windowHeight);
             //All Components are initialized
             TransformSystem.Initialize();
             ScreenRectangleSystem.Initialize();
@@ -202,6 +206,14 @@ namespace Physics_Engine
             SDL_GetRendererOutputSize(renderer, out windowWidth, out windowHeight);
 
         }
+
+        static void UpdatePhysics()
+        {
+            float dt = (float)deltaTime;
+            CollisionSystem.Update(dt);
+            RigidBodySystem.Update(dt);
+
+        }
         /// <summary>
         /// Renders to the window.
         /// </summary>
@@ -215,8 +227,6 @@ namespace Physics_Engine
 
             //updates components for new frame
             UpdateSystems();
-
-
 
             // Switches out the currently presented render surface with the one we just did work on.
             SDL_RenderPresent(renderer);
