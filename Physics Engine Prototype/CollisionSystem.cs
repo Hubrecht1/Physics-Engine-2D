@@ -158,9 +158,6 @@ namespace Physics_Engine
             Vector2 a_Max = aPos + new Vector2(A.width, A.height);
             Vector2 b_Max = bPos + new Vector2(B.width, B.height);
 
-            if (a_Max.X < b_Min.X || a_Min.X > b_Max.X) { return false; }
-            if (a_Max.Y < b_Min.Y || a_Min.Y > b_Max.Y) { return false; }
-
             // Vector from A to B 
             Vector2 n = bPos - aPos;
             // Calculate half extents along x axis for each object 
@@ -190,8 +187,9 @@ namespace Physics_Engine
                         if (n.X < 0)
                             normal = new Vector2(-1, 0);
                         else
-                            normal = new Vector2(0, 0);
+                            normal = new Vector2(1, 0);
                         penetration = x_overlap;
+
                         return true;
                     }
                     else
@@ -202,6 +200,7 @@ namespace Physics_Engine
                         else
                             normal = new Vector2(0, 1);
                         penetration = y_overlap;
+
                         return true;
                     }
                 }

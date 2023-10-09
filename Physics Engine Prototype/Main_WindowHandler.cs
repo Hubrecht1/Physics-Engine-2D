@@ -20,7 +20,7 @@ namespace Physics_Engine
         static uint physicsTPS = 60;
         static uint frameCount = 0;
         static float totalsecondsElapsed = 0;
-
+        static SDL_Color TextColor = new SDL_Color { r = 0, g = 0, b = 0, a = 255 };
         //public static event EventHandler Draw;
 
         //main loop
@@ -47,7 +47,7 @@ namespace Physics_Engine
 
                 PollEvents();
                 float physicsStart = SDL_GetPerformanceCounter();
-                UpdatePhysics();
+                UpdatePhysics((float)deltaTime);
                 float physicsEnd = SDL_GetPerformanceCounter();
                 Render();
 
@@ -136,36 +136,60 @@ namespace Physics_Engine
                 Console.WriteLine($"There was an issue creating the renderer. {SDL_GetError()}");
             }
 
-            UpdateWindowSize();
-
-            //enityIsCreated
-            MyCharacter testobject0 = new MyCharacter(0, new Vector2(300, 30), 10);
-            MyCharacter testobject1 = new MyCharacter(1, new Vector2(100, 100), 40);
-            MyCharacter testobject2 = new MyCharacter(2, new Vector2(200, 50), 5);
-            MyCharacter testobject3 = new MyCharacter(3, new Vector2(250, 50));
-            MyCharacter testobject4 = new MyCharacter(7, new Vector2(250, 150), 10);
-
-            testobject1.GetComponent<RigidBody>().Velocity += new Vector2(-10f, 0);
-            testobject0.GetComponent<RigidBody>().Velocity += new Vector2(10f, 0);
-            testobject4.GetComponent<RigidBody>().Velocity += new Vector2(0, 0);
-
-            MycharacterBox box = new MycharacterBox(4, new Vector2(0, windowHeight), windowWidth, 2);
-            MycharacterBox box1 = new MycharacterBox(5, new Vector2(0, 0), 2, windowHeight);
-            MycharacterBox box2 = new MycharacterBox(6, new Vector2(windowWidth, 0), 2, windowHeight);
-            //All Components are initialized
-            TransformSystem.Initialize();
-            ScreenRectangleSystem.Initialize();
-            ScreenCircleSystem.Initialize();
-
-            RigidBodySystem.Initialize();
-            CollisionSystem.Initialize();
-
             Console.ForegroundColor = ConsoleColor.DarkGreen;
 
             Console.WriteLine("Succesfully started " + windowName);
             Console.ResetColor();
+
+            UpdateWindowSize();
+
+            CreateEntities();
+            InitializeSystems();
+
+
         }
 
+        static void CreateEntities()
+        {
+            List<RB_Box> rB_StaticBoxes = new List<RB_Box>();
+            List<RB_Box> rB_DynamicBoxes = new List<RB_Box>();
+            List<RB_Circle> rB_DynamicCircles = new List<RB_Circle>();
+
+            rB_StaticBoxes.Add(new RB_Box(0, new Vector2(0, windowHeight), windowWidth, 4, 0, 0.5f));
+            rB_StaticBoxes.Add(new RB_Box(1, new Vector2(0, 0), 4, windowHeight, 0, 1));
+            rB_StaticBoxes.Add(new RB_Box(2, new Vector2(windowWidth, 0), 4, windowHeight, 0f));
+
+            //rB_DynamicBoxes.Add(new RB_Box(3, new Vector2(50, 50), 40, 40));
+
+            //left ball
+            rB_DynamicCircles.Add(new RB_Circle(4, new Vector2(40, 40), 20, 1f, 0.7f));
+
+            //right ball
+            rB_DynamicCircles.Add(new RB_Circle(5, new Vector2(100, 40), 20, 10f, 0.7f));
+
+        }
+
+
+        static void InitializeSystems()
+        {
+            //All Components are initialized
+            TransformSystem.Initialize();
+            ScreenRectangleSystem.Initialize();
+            ScreenCircleSystem.Initialize();
+            RigidBodySystem.Initialize();
+            CollisionSystem.Initialize();
+
+
+        }
+
+        static void OnKeyDown(SDL_Keysym keySym)
+        {
+            if (keySym.sym == SDL_Keycode.SDLK_RETURN)
+            {
+                //UpdatePhysics(0.1f);
+            }
+
+        }
 
         /// <summary>
         /// Checks to see if there are any events to be processed.
@@ -177,6 +201,10 @@ namespace Physics_Engine
             {
                 switch (e.type)
                 {
+                    case SDL_EventType.SDL_KEYDOWN:
+                        OnKeyDown(e.key.keysym);
+                        continue;
+
                     case SDL_EventType.SDL_QUIT:
                         running = false;
                         break;
@@ -207,9 +235,9 @@ namespace Physics_Engine
 
         }
 
-        static void UpdatePhysics()
+        static void UpdatePhysics(float dt)
         {
-            float dt = (float)deltaTime;
+
             CollisionSystem.Update(dt);
             RigidBodySystem.Update(dt);
 
