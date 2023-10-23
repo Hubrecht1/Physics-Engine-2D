@@ -158,55 +158,57 @@ namespace Physics_Engine
             Vector2 a_Max = aPos + new Vector2(A.width, A.height);
             Vector2 b_Max = bPos + new Vector2(B.width, B.height);
 
-            // Vector from A to B 
-            Vector2 n = bPos - aPos;
-            // Calculate half extents along x axis for each object 
+            Vector2 aCenter = aPos + (0.5f * new Vector2(A.width, A.height));
+            Vector2 bCenter = bPos + (0.5f * new Vector2(B.width, B.height));
+
+            // Calculate the vector from A's center to B's center
+            Vector2 n = bCenter - aCenter;
+
+            // Calculate half extents along x axis for each object
             float a_extent = (a_Max.X - a_Min.X) / 2;
             float b_extent = (b_Max.X - b_Min.X) / 2;
 
-            // Calculate overlap on x axis 
+            // Calculate overlap on x axis
             float x_overlap = a_extent + b_extent - Math.Abs(n.X);
 
-            // SAT test on x axis 
+            // SAT test on x axis
             if (x_overlap > 0)
             {
-                // Calculate half extents along x axis for each object 
+                // Calculate half extents along y axis for each object
                 a_extent = (a_Max.Y - a_Min.Y) / 2;
                 b_extent = (b_Max.Y - b_Min.Y) / 2;
 
-                // Calculate overlap on y axis 
+                // Calculate overlap on y axis
                 float y_overlap = a_extent + b_extent - Math.Abs(n.Y);
 
-                // SAT test on y axis 
+                // SAT test on y axis
                 if (y_overlap > 0)
                 {
-                    // Find out which axis is axis of least penetration 
-                    if (x_overlap > y_overlap)
+                    // Find out which axis is axis of least penetration
+                    if (x_overlap < y_overlap)
                     {
-                        // Point towards B knowing that n points from A to B 
+                        // Point towards B knowing that n points from A to B
                         if (n.X < 0)
                             normal = new Vector2(-1, 0);
                         else
                             normal = new Vector2(1, 0);
                         penetration = x_overlap;
-
-                        return true;
                     }
                     else
                     {
-                        // Point toward B knowing that n points from A to B 
+                        // Point toward B knowing that n points from A to B
                         if (n.Y < 0)
                             normal = new Vector2(0, -1);
                         else
                             normal = new Vector2(0, 1);
                         penetration = y_overlap;
-
-                        return true;
                     }
+
+                    return true;
                 }
-                else { return false; }
             }
-            else { return false; }
+
+            return false;
         }
 
 
@@ -281,6 +283,11 @@ namespace Physics_Engine
 
         static void PositionalCorrection(RigidBody A, RigidBody B, Vector2 normal, float penetration)
         {
+            if (A.mass == 0 && B.mass == 0)
+            {
+                return;
+            }
+
             const float percent = 0.1f; // usually 20% to 80%
             const float slop = 0.02f;   // usually 0.01 to 0.1
 

@@ -21,7 +21,9 @@ namespace Physics_Engine
         static uint frameCount = 0;
         static float totalsecondsElapsed = 0;
         static SDL_Color TextColor = new SDL_Color { r = 0, g = 0, b = 0, a = 255 };
-        //public static event EventHandler Draw;
+
+        static double FixedTimeStep = 1.0d / 1000d; //  TPS
+        static double accumulator = 0.0;
 
         //main loop
         static void Main(string[] args)
@@ -155,20 +157,22 @@ namespace Physics_Engine
             List<RB_Box> rB_DynamicBoxes = new List<RB_Box>();
             List<RB_Circle> rB_DynamicCircles = new List<RB_Circle>();
 
-            rB_StaticBoxes.Add(new RB_Box(0, new Vector2(0, windowHeight), windowWidth, 4, 0, 0.5f));
+            rB_StaticBoxes.Add(new RB_Box(0, new Vector2(0, windowHeight - 30), windowWidth, 4, 0, 0.5f));
             rB_StaticBoxes.Add(new RB_Box(1, new Vector2(0, 0), 4, windowHeight, 0, 1));
             rB_StaticBoxes.Add(new RB_Box(2, new Vector2(windowWidth, 0), 4, windowHeight, 0f));
 
-            //rB_DynamicBoxes.Add(new RB_Box(3, new Vector2(50, 50), 40, 40));
+            rB_DynamicBoxes.Add(new RB_Box(3, new Vector2(200, 50), 40, 40));
 
             //left ball
-            rB_DynamicCircles.Add(new RB_Circle(4, new Vector2(40, 40), 20, 1f, 0.7f));
+            rB_DynamicCircles.Add(new RB_Circle(4, new Vector2(40, 40), 20, -1, 0.7f));
 
             //right ball
-            rB_DynamicCircles.Add(new RB_Circle(5, new Vector2(100, 40), 20, 10f, 0.7f));
+            RB_Circle test = new RB_Circle(5, new Vector2(200, 40), 15, -1, 0.7f);
+
+            rB_DynamicCircles.Add(test);
+            test.GetComponent<RigidBody>().Velocity = new Vector2(-4, 0);
 
         }
-
 
         static void InitializeSystems()
         {
@@ -178,7 +182,6 @@ namespace Physics_Engine
             ScreenCircleSystem.Initialize();
             RigidBodySystem.Initialize();
             CollisionSystem.Initialize();
-
 
         }
 
@@ -237,9 +240,21 @@ namespace Physics_Engine
 
         static void UpdatePhysics(float dt)
         {
+            accumulator += dt;
 
-            CollisionSystem.Update(dt);
-            RigidBodySystem.Update(dt);
+            while (accumulator >= FixedTimeStep)
+            {
+                float fixedTimeStepFloat = (float)FixedTimeStep;
+
+                // Update your physics here with a fixed time step.
+                CollisionSystem.Update(fixedTimeStepFloat);
+                RigidBodySystem.Update(fixedTimeStepFloat);
+
+                accumulator -= FixedTimeStep;
+
+
+            }
+
 
         }
         /// <summary>
@@ -272,9 +287,6 @@ namespace Physics_Engine
             Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.WriteLine("\nSuccesfully closed " + windowName);
         }
-
-
-
 
     }
 }

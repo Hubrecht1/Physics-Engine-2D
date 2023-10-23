@@ -13,7 +13,6 @@ namespace Physics_Engine
         public float dragCoefficient = 0;
         public float crossSectionArea = 0;
 
-
         Vector2 Force = Vector2.Zero;
         //Vector2 Fdrag = Vector2.Zero;
         Vector2 NewPosition = Vector2.Zero;

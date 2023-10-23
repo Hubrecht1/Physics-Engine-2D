@@ -29,7 +29,7 @@ namespace Physics_Engine
 
             if (mass == -1.0f)
             {
-                mass = PhysicsConstants.inv_pixelSizeInMeters * radius;
+                mass = PhysicsConstants.inv_pixelSizeInMeters * MathF.PI * MathF.Pow(radius, 2);
             }
 
             RigidBody rigidBody = new RigidBody(mass, restitution);
@@ -58,7 +58,7 @@ namespace Physics_Engine
 
             if (mass == -1.0f)
             {
-                mass = PhysicsConstants.inv_pixelSizeInMeters * MathF.Sqrt((int)(Math.Pow(width, 2) + Math.Pow(height, 2)));
+                mass = PhysicsConstants.inv_pixelSizeInMeters * width * height;
             }
 
             RigidBody rigidBody = new RigidBody(mass, restitution);

@@ -21,7 +21,9 @@ namespace Physics_Engine
         public override void Initialize()
         {
             rigidBody = entity.GetComponent<RigidBody>();
-
+            rigidBody = entity.GetComponent<RigidBody>();
+            rigidBody.crossSectionArea = (width + height) / 2;
+            rigidBody.dragCoefficient = 1.05f;
         }
     }
 }
