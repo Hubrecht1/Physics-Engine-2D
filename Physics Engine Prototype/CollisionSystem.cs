@@ -7,6 +7,7 @@ namespace Physics_Engine
     {
         protected static List<CircleCollider> circleColliders = new List<CircleCollider>();
         protected static List<BoxCollider> boxColliders = new List<BoxCollider>();
+        static List<Manifold> contactList;
 
         public static void Register(CircleCollider circleCollider)
         {
@@ -74,6 +75,16 @@ namespace Physics_Engine
                     }
                 }
             }
+
+            //resolves collisions:
+
+            //for (int i = 0; i < contactList.Count; i++)
+            //{
+            //    //resolve(contact[i])
+            //}
+            //contactList.Clear();
+
+
         }
 
 
@@ -296,6 +307,13 @@ namespace Physics_Engine
             A.entityTransform.position -= A.inv_mass * correction;
             B.entityTransform.position += B.inv_mass * correction;
         }
+
+        static void ResolveCollisionWithRotation(RigidBody A, RigidBody B, Vector2 normal)
+        {
+
+
+        }
+
 
 
     }
