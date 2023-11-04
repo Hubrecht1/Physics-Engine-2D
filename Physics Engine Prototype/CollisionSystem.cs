@@ -7,7 +7,14 @@ namespace Physics_Engine
     {
         protected static List<CircleCollider> circleColliders = new List<CircleCollider>();
         protected static List<BoxCollider> boxColliders = new List<BoxCollider>();
+
+        protected static List<CircleCollider> big_CircleColliders = new List<CircleCollider>();
+        protected static List<BoxCollider> big_BoxColliders = new List<BoxCollider>();
+
         static List<Manifold> contactList;
+
+        static CollisionGrid collisionGrid = new CollisionGrid(40, 40);
+
 
         public static void Register(CircleCollider circleCollider)
         {
@@ -32,60 +39,128 @@ namespace Physics_Engine
 
         public static void Update(float dt)
         {
+            FindAndSolveCollisions(circleColliders, boxColliders);
+            //MakeCollisionGrid();
+            //SolveGrid(circleColliders, boxColliders);
+            //collisionGrid.ClearGrid();
 
+
+
+        }
+
+
+
+        static void FindAndSolveCollisions(List<CircleCollider> _circleColliders, List<BoxCollider> _boxColliders)
+        {
             //checks every posible circlevscircle collision
-            for (int i = 0; i < circleColliders.Count; i++)
+            for (int i = 0; i < _circleColliders.Count; i++)
             {
-                for (int j = i + 1; j < circleColliders.Count; j++)
+                for (int j = i + 1; j < _circleColliders.Count; j++)
                 {
                     float penetration = 0f;
                     Vector2 collisionNormal = Vector2.Zero;
-                    if (CirclevsCircle(circleColliders[i], circleColliders[j], ref collisionNormal, ref penetration))
+                    if (CirclevsCircle(_circleColliders[i], _circleColliders[j], ref collisionNormal, ref penetration))
                     {
-                        ResolveCollision(circleColliders[i].rigidBody, circleColliders[j].rigidBody, collisionNormal);
-                        PositionalCorrection(circleColliders[i].rigidBody, circleColliders[j].rigidBody, collisionNormal, penetration);
+                        ResolveCollision(_circleColliders[i].rigidBody, _circleColliders[j].rigidBody, collisionNormal);
+                        PositionalCorrection(_circleColliders[i].rigidBody, _circleColliders[j].rigidBody, collisionNormal, penetration);
                     }
                 }
             }
             //checks every posible boxvsbox collision
-            for (int i = 0; i < boxColliders.Count; i++)
+            for (int i = 0; i < _boxColliders.Count; i++)
             {
-                for (int j = i + 1; j < boxColliders.Count; j++)
+                for (int j = i + 1; j < _boxColliders.Count; j++)
                 {
                     float penetration = 0f;
                     Vector2 collisionNormal = Vector2.Zero;
-                    if (BoxvsBox(boxColliders[i], boxColliders[j], ref collisionNormal, ref penetration))
+                    if (BoxvsBox(_boxColliders[i], _boxColliders[j], ref collisionNormal, ref penetration))
                     {
-                        ResolveCollision(boxColliders[i].rigidBody, boxColliders[j].rigidBody, collisionNormal);
-                        PositionalCorrection(boxColliders[i].rigidBody, boxColliders[j].rigidBody, collisionNormal, penetration);
+                        ResolveCollision(_boxColliders[i].rigidBody, _boxColliders[j].rigidBody, collisionNormal);
+                        PositionalCorrection(_boxColliders[i].rigidBody, _boxColliders[j].rigidBody, collisionNormal, penetration);
                     }
                 }
             }
             //checks every posible circlevsbox collision
-            for (int i = 0; i < circleColliders.Count; i++)
+            for (int i = 0; i < _circleColliders.Count; i++)
             {
-                for (int j = 0; j < boxColliders.Count; j++)
+
+
+                for (int j = 0; j < _boxColliders.Count; j++)
                 {
                     float penetration = 0f;
                     Vector2 collisionNormal = Vector2.Zero;
-                    if (BoxvsCircle(circleColliders[i], boxColliders[j], ref collisionNormal, ref penetration))
+                    if (BoxvsCircle(_circleColliders[i], _boxColliders[j], ref collisionNormal, ref penetration))
                     {
-                        ResolveCollision(circleColliders[i].rigidBody, boxColliders[j].rigidBody, collisionNormal);
-                        PositionalCorrection(circleColliders[i].rigidBody, boxColliders[j].rigidBody, collisionNormal, penetration);
+                        ResolveCollision(_circleColliders[i].rigidBody, _boxColliders[j].rigidBody, collisionNormal);
+                        PositionalCorrection(_circleColliders[i].rigidBody, _boxColliders[j].rigidBody, collisionNormal, penetration);
                     }
+
+
+
                 }
             }
 
-            //resolves collisions:
-
-            //for (int i = 0; i < contactList.Count; i++)
-            //{
-            //    //resolve(contact[i])
-            //}
-            //contactList.Clear();
-
 
         }
+
+        static void FindAndSolveCollisionsFromCollider(BoxCollider collider, List<CircleCollider> _circleColliders, List<BoxCollider> _boxColliders)
+        {
+            //boxvsbox
+            for (int i = 0; i < _boxColliders.Count; i++)
+            {
+                float penetration = 0f;
+                Vector2 collisionNormal = Vector2.Zero;
+                if (BoxvsBox(collider, _boxColliders[i], ref collisionNormal, ref penetration))
+                {
+                    ResolveCollision(collider.rigidBody, _boxColliders[i].rigidBody, collisionNormal);
+                    PositionalCorrection(collider.rigidBody, _boxColliders[i].rigidBody, collisionNormal, penetration);
+                }
+            }
+
+            //boxvscircle
+            for (int i = 0; i < _circleColliders.Count; i++)
+            {
+                float penetration = 0f;
+                Vector2 collisionNormal = Vector2.Zero;
+                if (BoxvsCircle(_circleColliders[i], collider, ref collisionNormal, ref penetration))
+                {
+                    ResolveCollision(collider.rigidBody, _circleColliders[i].rigidBody, collisionNormal);
+                    PositionalCorrection(collider.rigidBody, _circleColliders[i].rigidBody, collisionNormal, penetration);
+                }
+            }
+
+        }
+
+        static void FindAndSolveCollisionsFromCollider(CircleCollider collider, List<CircleCollider> _circleColliders, List<BoxCollider> _boxColliders)
+        {
+            //circlevscircle
+            for (int i = 0; i < _circleColliders.Count; i++)
+            {
+                float penetration = 0f;
+                Vector2 collisionNormal = Vector2.Zero;
+                if (CirclevsCircle(collider, _circleColliders[i], ref collisionNormal, ref penetration))
+                {
+                    ResolveCollision(collider.rigidBody, _circleColliders[i].rigidBody, collisionNormal);
+                    PositionalCorrection(collider.rigidBody, _boxColliders[i].rigidBody, collisionNormal, penetration);
+                }
+            }
+
+            //boxvscircle
+            for (int i = 0; i < _boxColliders.Count; i++)
+            {
+                float penetration = 0f;
+                Vector2 collisionNormal = Vector2.Zero;
+                if (BoxvsCircle(collider, _boxColliders[i], ref collisionNormal, ref penetration))
+                {
+                    ResolveCollision(collider.rigidBody, _boxColliders[i].rigidBody, collisionNormal);
+                    PositionalCorrection(collider.rigidBody, _boxColliders[i].rigidBody, collisionNormal, penetration);
+                }
+            }
+
+        }
+
+
+
 
 
         static void ResolveCollision(RigidBody A, RigidBody B, Vector2 normal)
@@ -308,11 +383,109 @@ namespace Physics_Engine
             B.entityTransform.position += B.inv_mass * correction;
         }
 
-        static void ResolveCollisionWithRotation(RigidBody A, RigidBody B, Vector2 normal)
+        static void SolveGrid(List<CircleCollider> _circleColliders, List<BoxCollider> _boxColliders)
         {
+            //solves collisions for objects that don't fit in grid
+            for (int i = 0; i < big_BoxColliders.Count; i++)
+            {
+                FindAndSolveCollisionsFromCollider(big_BoxColliders[i], _circleColliders, _boxColliders);
+            }
+            for (int i = 0; i < big_CircleColliders.Count; i++)
+            {
+                FindAndSolveCollisionsFromCollider(big_CircleColliders[i], _circleColliders, _boxColliders);
+            }
+
+            //solves grid
+
+            for (int i = 0; i < collisionGrid.collisionCells.Count(); i++)
+            {
+                Vector2 cellPos = collisionGrid.collisionCells[i].Item1;
+                CollisionCell currentCell = collisionGrid.collisionCells[i].Item2;
+
+                for (int dx = -1; dx <= 1; dx++)
+                {
+                    for (int dy = -1; dy <= 1; dy++)
+                    {
+                        CollisionCell? otherCell = collisionGrid.GetCell((int)cellPos.X, (int)cellPos.Y);
+                        if (otherCell != null)
+                        {
+                            FindAndSolveCollisions(currentCell.GetCircleColliders(), otherCell.GetValueOrDefault().GetBoxColliders());
+                            FindAndSolveCollisions(otherCell.GetValueOrDefault().GetCircleColliders(), currentCell.GetBoxColliders());
+
+                        }
+                    }
+                }
+
+            }
 
 
         }
+
+
+        static void MakeCollisionGrid()
+        {
+            for (int i = 0; i < boxColliders.Count; i++)
+            {
+                BoxCollider collider = boxColliders[i];
+
+                if (!ColliderFitsIncell(collider))
+                {
+                    big_BoxColliders.Add(collider);
+                    return;
+                }
+
+                Vector2 boxCenter = new Vector2(collider.rigidBody.entityTransform.position.X + ((float)collider.width / 2), collider.rigidBody.entityTransform.position.Y - ((float)collider.height / 2));
+                Vector2 cellPos = collisionGrid.GetCellPosition(boxCenter);
+                collisionGrid.AddColliderToCell((int)cellPos.X, (int)cellPos.Y, collider);
+
+            }
+            for (int i = 0; i < circleColliders.Count; i++)
+            {
+                CircleCollider collider = circleColliders[i];
+
+                if (!ColliderFitsIncell(collider))
+                {
+                    big_CircleColliders.Add(collider);
+                    return;
+                }
+
+                Vector2 cellPos = collisionGrid.GetCellPosition(collider.rigidBody.entityTransform.position);
+                collisionGrid.AddColliderToCell((int)cellPos.X, (int)cellPos.Y, collider);
+
+
+            }
+
+        }
+
+        static bool ColliderFitsIncell(BoxCollider _boxCollider)
+        {
+            if (_boxCollider.width >= collisionGrid.cell_width || _boxCollider.height >= collisionGrid.cell_height)
+            {
+                return false;
+            }
+            return true;
+
+        }
+
+        static bool ColliderFitsIncell(CircleCollider _CircleCollider)
+        {
+            if (2 * _CircleCollider.radius >= collisionGrid.cell_width || 2 * _CircleCollider.radius >= collisionGrid.cell_height)
+            {
+                return false;
+            }
+            return true;
+
+        }
+
+
+
+
+
+
+
+
+
+
 
 
 

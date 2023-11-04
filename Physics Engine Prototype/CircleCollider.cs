@@ -5,10 +5,10 @@ namespace Physics_Engine
 {
     public class CircleCollider : Component
     {
-        public float radius;
+        public int radius;
         public RigidBody rigidBody;
 
-        public CircleCollider(float _radius)
+        public CircleCollider(int _radius)
         {
             radius = _radius;
             CollisionSystem.Register(this);

@@ -14,9 +14,7 @@ namespace Physics_Engine
         public float crossSectionArea = 0;
 
         Vector2 Force = Vector2.Zero;
-        //Vector2 Fdrag = Vector2.Zero;
         Vector2 NewPosition = Vector2.Zero;
-
 
         public RigidBody(float _mass, float _restitution = 0.1f)
         {
@@ -44,15 +42,13 @@ namespace Physics_Engine
 
         public override void Update(float dt)
         {
-
             Force += -PhysicsConstants.GravityAccelaration * mass;
             Force += -0.5f * PhysicsConstants.airDensity * Velocity * Vector2.Abs(Velocity) * crossSectionArea * dragCoefficient;
+
+
             Velocity += Force * inv_mass * dt;
-
-            //Fdrag = -0.5f * PhysicsConstants.airDensity * Velocity * Vector2.Abs(Velocity) * crossSectionArea * dragCoefficient;
-            //Velocity += Fdrag * inv_mass * dt;
-
             NewPosition += Velocity * dt * PhysicsConstants.inv_pixelSizeInMeters;
+
             Force = Vector2.Zero;
 
             UpdatePosition();

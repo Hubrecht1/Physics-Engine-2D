@@ -10,14 +10,12 @@ namespace Physics_Engine
         public static IntPtr renderer;
         public static bool running = true;
         public static string windowName = "Physics_Engine";
-        public static int windowHeight = 600;
-        public static int windowWidth = 600;
+        public static int windowHeight = 1000;
+        public static int windowWidth = 1200;
 
         static ulong NOW, LAST = 0;
-        static bool firstFrame = true;
 
         static double deltaTime = 0;
-        static uint physicsTPS = 60;
         static uint frameCount = 0;
 
         static double totalSecondsElapsed = 0;
@@ -25,8 +23,10 @@ namespace Physics_Engine
 
         static SDL_Color TextColor = new SDL_Color { r = 0, g = 0, b = 0, a = 255 };
 
-        static double FixedTimeStep = 1.0d / 10_000d; //  TPS
+        static double PhysicsTPS = 1.0d / 144d; //  TPS
         static double accumulator = 0.0;
+
+
 
         //main loop
         static void Main(string[] args)
@@ -63,11 +63,19 @@ namespace Physics_Engine
                 totalSecondsElapsed += secondsElapsed;
                 totalPhysicsSecondsElapsed += 1000 * physicsTimeElapsed;
 
-                if (frameCount % 10 == 0)
+                if (frameCount % 30 == 0)
                 {
-                    double averageFPS = Math.Round(10 / totalSecondsElapsed, 2);
-                    double averagePhysicsTime = Math.Round(((totalPhysicsSecondsElapsed) / 10), 2);
-                    string line = $"(average)fps {averageFPS}; dt: {Math.Round(deltaTime * 1000, 2)} ms; physics: {averagePhysicsTime} ms";
+                    double averageFPS = Math.Round(30 / totalSecondsElapsed, 2);
+                    double averagePhysicsTime = Math.Round(((totalPhysicsSecondsElapsed) / 30), 2);
+
+                    if (averagePhysicsTime >= totalSecondsElapsed * 1000 / 60) //2*30=60
+                    {
+                        PhysicsTPS *= 2;
+
+                    }
+
+                    string line = $"(average)fps {averageFPS}; dt: {Math.Round(deltaTime * 1000, 2)} ms; physics: {averagePhysicsTime} ms; TPS: {1 / (float)PhysicsTPS}";
+
                     Console.Clear();
                     Console.Write(line);
 
@@ -78,7 +86,7 @@ namespace Physics_Engine
 #else
 
                 PollEvents();
-
+                UpdatePhysics((float)deltaTime);
                 Render();
 
 
@@ -168,18 +176,8 @@ namespace Physics_Engine
             rB_StaticBoxes.Add(new RB_Box(1, new Vector2(0, 0), 4, windowHeight, 0, 1));
             rB_StaticBoxes.Add(new RB_Box(2, new Vector2(windowWidth - 4, 0), 4, windowHeight, 0f));
 
-            rB_DynamicBoxes.Add(new RB_Box(3, new Vector2(200, 50), 40, 40));
+            rB_DynamicBoxes.Add(new RB_Box(3, new Vector2(200, 50), 40, 40, -1f, 1.0f));
 
-            //left ball
-            rB_DynamicCircles.Add(new RB_Circle(4, new Vector2(40, 40), 20, -1, 0.7f));
-            rB_DynamicCircles.Add(new RB_Circle(6, new Vector2(400, 40), 35, -1, 0.7f));
-            rB_DynamicCircles.Add(new RB_Circle(7, new Vector2(420, 80), 5, -1, 0.7f));
-
-            //right ball
-            RB_Circle test = new RB_Circle(5, new Vector2(200, 40), 15, -1, 0.7f);
-
-            rB_DynamicCircles.Add(test);
-            test.GetComponent<RigidBody>().Velocity = new Vector2(-8, 0);
 
         }
 
@@ -194,37 +192,38 @@ namespace Physics_Engine
 
         }
 
-        static void OnMouseDown(SDL_MouseButtonEvent mouseEvent)
-        {
-            if (mouseEvent.button == SDL_BUTTON_RIGHT)
-            {
-                UInt32 MouseInfo = SDL_GetMouseState(out int x, out int y);
-
-                RB_Circle test = new RB_Circle(5, new Vector2(x, y), 15, -1, 0.7f, true);
-            }
-
-        }
-
         /// <summary>
         /// Checks to see if there are any events to be processed.
         /// </summary>
         static void PollEvents()
         {
+            uint MouseState = SDL_GetMouseState(out int x, out int y);
+
+            if (MouseState == SDL_BUTTON_X1)
+            {
+                new RB_Circle(5, new Vector2(x, y), new Random().Next(4, 20), -1, 0.7f, true);
+
+            }
+
             // Check to see if there are any events and continue to do so until the queue is empty.
             while (SDL_PollEvent(out SDL_Event e) == 1)
             {
                 switch (e.type)
                 {
-                    case SDL_EventType.SDL_MOUSEBUTTONDOWN:
-                        OnMouseDown(e.button);
-                        continue;
-
                     case SDL_EventType.SDL_QUIT:
                         running = false;
                         break;
+                    case SDL_EventType.SDL_KEYDOWN:
+                        if (e.key.keysym.sym == SDL_Keycode.SDLK_ESCAPE)
+                        {
+                            running = false;
+                            break;
+                        }
+                        continue;
                     case SDL_EventType.SDL_WINDOWEVENT:
                         HandleWindowEvents(e.window);
                         break;
+
 
                 }
 
@@ -253,15 +252,15 @@ namespace Physics_Engine
         {
             accumulator += dt;
 
-            while (accumulator >= FixedTimeStep)
+            while (accumulator >= PhysicsTPS)
             {
-                float fixedTimeStepFloat = (float)FixedTimeStep;
+                float fixedTimeStepFloat = (float)PhysicsTPS;
 
                 // Update update
                 CollisionSystem.Update(fixedTimeStepFloat);
                 RigidBodySystem.Update(fixedTimeStepFloat);
 
-                accumulator -= FixedTimeStep;
+                accumulator -= PhysicsTPS;
 
 
             }
@@ -273,7 +272,7 @@ namespace Physics_Engine
         static void Render()
         {
             // Sets the color that the screen will be cleared with.
-            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            SDL_SetRenderDrawColor(renderer, 50, 60, 70, 255);
 
             // Clears the current render surface.
             SDL_RenderClear(renderer);

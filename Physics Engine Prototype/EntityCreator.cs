@@ -15,7 +15,7 @@ namespace Physics_Engine
 
     public class RB_Circle : Entity
     {
-        public SDL_Color color = new SDL_Color { r = 255, g = 255, b = 255, a = 255 };
+        public SDL_Color color = new SDL_Color { r = 30, g = 200, b = 180, a = 255 };
 
         public RB_Circle(uint _ID, Vector2 position, int radius, float mass = -1.0f, float restitution = 0.1f, bool inRuntime = false)
         {
@@ -53,9 +53,9 @@ namespace Physics_Engine
 
     public class RB_Box : Entity
     {
-        public SDL_Color color = new SDL_Color { r = 255, g = 255, b = 255, a = 255 };
+        public SDL_Color color = new SDL_Color { r = 185, g = 76, b = 76, a = 255 };
 
-        public RB_Box(uint _ID, Vector2 position, int width, int height, float mass = -1.0f, float restitution = 0.1f)
+        public RB_Box(uint _ID, Vector2 position, int width, int height, float mass = -1.0f, float restitution = 0.1f, bool inRuntime = false)
         {
             ID = _ID;
             Transform transform = new Transform();
@@ -78,6 +78,14 @@ namespace Physics_Engine
             AddComponent(screenRectangle);
             AddComponent(rigidBody);
             AddComponent(boxCollider);
+
+            if (inRuntime)
+            {
+                transform.Initialize();
+                screenRectangle.Initialize();
+                rigidBody.Initialize();
+                boxCollider.Initialize();
+            }
 
         }
 
