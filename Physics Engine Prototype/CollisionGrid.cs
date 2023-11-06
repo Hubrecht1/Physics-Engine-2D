@@ -8,6 +8,7 @@ namespace Physics_Engine
         Vector2 TopLeftCell;
         Vector2 BottomRightCell;
         public float cellSize;
+
         public List<List<CollisionCell>> collisionCells = new List<List<CollisionCell>>();
 
         public CollisionGrid(Vector2 _TopLeftCell, Vector2 _BottomRightCell, float _CellSize)

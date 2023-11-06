@@ -46,7 +46,7 @@ namespace Physics_Engine
 
             //collisionGrid = MakeGrid();
             //AddCollidersToGrid(collisionGrid);
-            // SolveGrid(collisionGrid);
+            //SolveGrid(collisionGrid);
             //collisionGrid.collisionCells.Clear();
 
             //double secondsElapsed = (solvingend - solving) / (double)SDL_GetPerformanceFrequency();
@@ -62,6 +62,7 @@ namespace Physics_Engine
             {
                 for (int j = i + 1; j < _circleColliders.Count; j++)
                 {
+
                     float penetration = 0f;
                     Vector2 collisionNormal = Vector2.Zero;
                     if (CirclevsCircle(_circleColliders[i], _circleColliders[j], ref collisionNormal, ref penetration))
@@ -203,13 +204,11 @@ namespace Physics_Engine
         {
             Vector2 aPos = a.rigidBody.entityTransform.position;
             Vector2 bPos = b.rigidBody.entityTransform.position;
-
-            Vector2 n = bPos - aPos;
+            Vector2 n = bPos - aPos; //distance vector a to b
             float r = a.radius + b.radius;
 
             if (n.LengthSquared() > r * r)
             {
-
                 return false;
             }
 
@@ -384,197 +383,10 @@ namespace Physics_Engine
             B.entityTransform.position += B.inv_mass * correction;
         }
 
-        static CollisionGrid MakeGrid()
-        {
-            float xMin = boxColliders.Min(x => x.rigidBody.entityTransform.position.X);
-            float yMin = boxColliders.Min(x => x.rigidBody.entityTransform.position.Y);
-            float xMax = boxColliders.Max(x => x.rigidBody.entityTransform.position.X);
-            float yMax = boxColliders.Max(x => x.rigidBody.entityTransform.position.Y);
 
-            Vector2 topLeft = new Vector2(xMin, yMin);
-            Vector2 bottomRight = new Vector2(xMax, yMax);
-
-            return new CollisionGrid(topLeft, bottomRight, cellSize);
-
-        }
-
-
-        static void AddCollidersToGrid(CollisionGrid _collisionGrid)
+        void AddCollidersToGrid(CollisionGrid collisionGrid)
         {
 
-            for (int i = 0; i < boxColliders.Count(); i++)
-            {
-                if (ColliderFitsIncell(boxColliders[i]))
-                {
-                    _collisionGrid.AddColliderToCell(boxColliders[i]);
-                }
-                else
-                {
-                    big_BoxColliders.Add(boxColliders[i]);
-
-                }
-
-            }
-
-            for (int i = 0; i < circleColliders.Count(); i++)
-            {
-                if (ColliderFitsIncell(circleColliders[i]))
-                {
-                    _collisionGrid.AddColliderToCell(circleColliders[i]);
-
-                }
-                else
-                {
-                    big_CircleColliders.Add(circleColliders[i]);
-
-                }
-            }
-
-        }
-
-        static void SolveGrid(CollisionGrid _collisionGrid)
-        {
-            //ulong start = SDL_GetPerformanceCounter();
-            for (int i = 0; i < big_BoxColliders.Count(); i++)
-            {
-                FindAndSolveCollisionsFromCollider(big_BoxColliders[i], circleColliders, boxColliders);
-            }
-
-            for (int i = 0; i < big_CircleColliders.Count(); i++)
-            {
-                FindAndSolveCollisionsFromCollider(big_CircleColliders[i], circleColliders, boxColliders);
-
-            }
-            //ulong end = SDL_GetPerformanceCounter();
-
-            //double secondsElapsed = (end - start) / (double)SDL_GetPerformanceFrequency();
-            //Console.WriteLine("bigcolldir :" + secondsElapsed * 1000);
-
-            for (int x = 0; x < _collisionGrid.collisionCells.Count() - 1; x++)
-            {
-                for (int y = 0; y < _collisionGrid.collisionCells[0].Count() - 1; y++)
-                {
-                    if (_collisionGrid.collisionCells[x][y].boxColliders.Count == 0 && _collisionGrid.collisionCells[x][y].circleColliders.Count == 0)
-                    {
-                        continue;
-                    }
-
-                    CollisionCell currentCell = _collisionGrid.collisionCells[x][y];
-
-                    int _dx = -1;
-                    int _dy = -1;
-                    if (x == 0)
-                    { _dx = 0; }
-                    if (y == 0)
-                    { _dy = 0; }
-
-
-                    for (int dx = _dx; dx <= 1; dx++)
-                    {
-                        for (int dy = _dy; dy <= 1; dy++)
-                        {
-
-                            CollisionCell otherCell = _collisionGrid.collisionCells[x + dx][y + dy];
-                            SolveCellCollisions(currentCell, otherCell);
-
-                        }
-
-                    }
-                    _collisionGrid.collisionCells[x][y].boxColliders.Clear();
-                    _collisionGrid.collisionCells[x][y].circleColliders.Clear();
-                }
-
-
-
-
-            }
-        }
-
-        static void SolveCellCollisions(CollisionCell cell1, CollisionCell cell2)
-        {
-            //checks every  circlevscircle collision
-            for (int i = 0; i < cell1.circleColliders.Count; i++)
-            {
-                for (int j = 0; j < cell2.circleColliders.Count; j++)
-                {
-                    if (cell1.circleColliders[i].GetHashCode() == cell2.circleColliders[j].GetHashCode())
-                    {
-                        continue;
-                    }
-                    float penetration = 0f;
-                    Vector2 collisionNormal = Vector2.Zero;
-                    if (CirclevsCircle(cell1.circleColliders[i], cell2.circleColliders[j], ref collisionNormal, ref penetration))
-                    {
-                        ResolveCollision(cell1.circleColliders[i].rigidBody, cell2.circleColliders[j].rigidBody, collisionNormal);
-                        PositionalCorrection(cell1.circleColliders[i].rigidBody, cell2.circleColliders[j].rigidBody, collisionNormal, penetration);
-                    }
-
-
-                }
-            }
-            //checks every  boxvsbox collision
-            for (int i = 0; i < cell1.boxColliders.Count; i++)
-            {
-                for (int j = 0; j < cell2.boxColliders.Count; j++)
-                {
-                    if (!cell1.boxColliders[i].Equals(cell2.boxColliders[j]))
-                    {
-                        {
-                            float penetration = 0f;
-                            Vector2 collisionNormal = Vector2.Zero;
-                            if (BoxvsBox(cell1.boxColliders[i], cell2.boxColliders[j], ref collisionNormal, ref penetration))
-                            {
-                                ResolveCollision(cell1.boxColliders[i].rigidBody, cell2.boxColliders[j].rigidBody, collisionNormal);
-                                PositionalCorrection(cell1.boxColliders[i].rigidBody, cell2.boxColliders[j].rigidBody, collisionNormal, penetration);
-                            }
-                        }
-                    }
-                }
-
-            }
-
-            //checks every  circlevsbox collision
-            for (int i = 0; i < cell1.circleColliders.Count; i++)
-            {
-                for (int j = 0; j < cell2.boxColliders.Count; j++)
-                {
-                    float penetration = 0f;
-                    Vector2 collisionNormal = Vector2.Zero;
-                    if (BoxvsCircle(cell1.circleColliders[i], cell2.boxColliders[j], ref collisionNormal, ref penetration))
-                    {
-                        ResolveCollision(cell1.circleColliders[i].rigidBody, cell2.boxColliders[j].rigidBody, collisionNormal);
-                        PositionalCorrection(cell1.circleColliders[i].rigidBody, cell2.boxColliders[j].rigidBody, collisionNormal, penetration);
-                    }
-
-
-
-                }
-            }
-
-            if (cell1.Equals(cell2))
-            {
-                return;
-            }
-
-
-            //checks every  boxvscircle collision
-            for (int i = 0; i < cell2.circleColliders.Count; i++)
-            {
-                for (int j = 0; j < cell1.boxColliders.Count; j++)
-                {
-
-                    float penetration = 0f;
-                    Vector2 collisionNormal = Vector2.Zero;
-                    if (BoxvsCircle(cell2.circleColliders[i], cell1.boxColliders[j], ref collisionNormal, ref penetration))
-                    {
-                        ResolveCollision(cell2.circleColliders[i].rigidBody, cell1.boxColliders[j].rigidBody, collisionNormal);
-                        PositionalCorrection(cell2.circleColliders[i].rigidBody, cell1.boxColliders[j].rigidBody, collisionNormal, penetration);
-                    }
-
-
-
-                }
-            }
 
         }
 
@@ -601,16 +413,17 @@ namespace Physics_Engine
 
 
 
-
-
-
-
-
-
-
-
-
-
     }
+
+
+
+
+
+
+
+
+
+
 }
+
 

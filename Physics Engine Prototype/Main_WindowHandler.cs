@@ -26,6 +26,7 @@ namespace Physics_Engine
         static double PhysicsTPS = 1.0d / 144d; //  TPS
         static double accumulator = 0.0;
 
+        static uint numberOfCircles = 0;
 
 
         //main loop
@@ -74,7 +75,7 @@ namespace Physics_Engine
 
                     }
 
-                    string line = $"(average)fps {averageFPS}; dt: {Math.Round(deltaTime * 1000, 2)} ms; physics: {averagePhysicsTime} ms; TPS: {1 / (float)PhysicsTPS}";
+                    string line = $"(average)fps {averageFPS}; dt: {Math.Round(deltaTime * 1000, 2)} ms; physics: {averagePhysicsTime} ms; TPS: {1 / (float)PhysicsTPS} circles: {numberOfCircles}";
 
                     Console.Clear();
                     Console.Write(line);
@@ -202,7 +203,7 @@ namespace Physics_Engine
             if (MouseState == SDL_BUTTON_X1)
             {
                 new RB_Circle(5, new Vector2(x, y), new Random().Next(4, 20), -1, 0.7f, true);
-
+                numberOfCircles++;
             }
 
             // Check to see if there are any events and continue to do so until the queue is empty.
