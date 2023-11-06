@@ -10,7 +10,6 @@ namespace Physics_Engine
         static uint ID = 0;
 
 
-
     }
 
     public class RB_Circle : Entity
