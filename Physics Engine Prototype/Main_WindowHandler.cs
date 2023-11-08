@@ -23,7 +23,7 @@ namespace Physics_Engine
 
         static SDL_Color TextColor = new SDL_Color { r = 0, g = 0, b = 0, a = 255 };
 
-        static double PhysicsTPS = 1.0d / 144d; //  TPS
+        static public double inv_PhysicsTPS = 1.0d / 2048d; //  TPS
         static double accumulator = 0.0;
 
         static uint numberOfCircles = 0;
@@ -50,11 +50,11 @@ namespace Physics_Engine
 #if DEBUG
                 frameCount++;
                 ulong start = SDL_GetPerformanceCounter();
-
                 PollEvents();
                 ulong physicsStart = SDL_GetPerformanceCounter();
                 UpdatePhysics((float)deltaTime);
                 ulong physicsEnd = SDL_GetPerformanceCounter();
+
                 Render();
 
                 ulong end = SDL_GetPerformanceCounter();
@@ -71,11 +71,11 @@ namespace Physics_Engine
 
                     if (averagePhysicsTime >= totalSecondsElapsed * 1000 / 60) //2*30=60
                     {
-                        PhysicsTPS *= 2;
+                        inv_PhysicsTPS *= 2;
 
                     }
 
-                    string line = $"(average)fps {averageFPS}; dt: {Math.Round(deltaTime * 1000, 2)} ms; physics: {averagePhysicsTime} ms; TPS: {1 / (float)PhysicsTPS} circles: {numberOfCircles}";
+                    string line = $"(average)fps {averageFPS}; dt: {Math.Round(deltaTime * 1000, 2)} ms; physics: {averagePhysicsTime} ms; TPS: {1 / (float)inv_PhysicsTPS} circles: {numberOfCircles}";
 
                     Console.Clear();
                     Console.Write(line);
@@ -88,6 +88,7 @@ namespace Physics_Engine
 
                 PollEvents();
                 UpdatePhysics((float)deltaTime);
+                
                 Render();
 
 
@@ -173,11 +174,24 @@ namespace Physics_Engine
             List<RB_Box> rB_DynamicBoxes = new List<RB_Box>();
             List<RB_Circle> rB_DynamicCircles = new List<RB_Circle>();
 
-            rB_StaticBoxes.Add(new RB_Box(0, new Vector2(0, windowHeight - 30), windowWidth, 4, 0, 0.5f));
-            rB_StaticBoxes.Add(new RB_Box(1, new Vector2(0, 0), 4, windowHeight, 0, 1));
-            rB_StaticBoxes.Add(new RB_Box(2, new Vector2(windowWidth - 4, 0), 4, windowHeight, 0f));
+            rB_StaticBoxes.Add(new RB_Box(0, new Vector2(0, windowHeight - 30), windowWidth, 8, 0, 0.5f));
 
-            rB_DynamicBoxes.Add(new RB_Box(3, new Vector2(200, 50), 40, 40, -1f, 1.0f));
+
+            rB_StaticBoxes.Add(new RB_Box(0, new Vector2(0, windowHeight), windowWidth, 8, 0, 0.5f));
+
+            rB_StaticBoxes.Add(new RB_Box(1, new Vector2(0, 0), 8, windowHeight, 0, 1));
+
+            //random box
+            rB_StaticBoxes.Add(new RB_Box(0, new Vector2(400, windowHeight - 200), 300, 8, 0, 0.5f));
+            rB_StaticBoxes.Add(new RB_Box(0, new Vector2(450, windowHeight - 300), 8, 100, 0, 0.5f));
+            rB_StaticBoxes.Add(new RB_Box(0, new Vector2(250, windowHeight - 300), 8, 100, 0, 0.5f));
+
+
+
+
+            rB_StaticBoxes.Add(new RB_Box(3, new Vector2(windowWidth - 4, 0), 8, windowHeight, 0f));
+
+            rB_DynamicBoxes.Add(new RB_Box(4, new Vector2(200, 50), 60, 60, -1f, 1.0f));
 
 
         }
@@ -202,7 +216,7 @@ namespace Physics_Engine
 
             if (MouseState == SDL_BUTTON_X1)
             {
-                new RB_Circle(5, new Vector2(x, y), new Random().Next(4, 20), -1, 0.7f, true);
+                new RB_Circle(5, new Vector2(x, y), new Random().Next(2, 10), -1, 0.7f, true).GetComponent<RigidBody>().Velocity = new Vector2(new Random().Next(-5, 5), new Random().Next(-5, 5));
                 numberOfCircles++;
             }
 
@@ -253,15 +267,15 @@ namespace Physics_Engine
         {
             accumulator += dt;
 
-            while (accumulator >= PhysicsTPS)
+            while (accumulator >= inv_PhysicsTPS)
             {
-                float fixedTimeStepFloat = (float)PhysicsTPS;
+                float fixedTimeStepFloat = (float)inv_PhysicsTPS;
 
                 // Update update
                 CollisionSystem.Update(fixedTimeStepFloat);
                 RigidBodySystem.Update(fixedTimeStepFloat);
 
-                accumulator -= PhysicsTPS;
+                accumulator -= inv_PhysicsTPS;
 
 
             }

@@ -12,7 +12,7 @@ namespace Physics_Engine
             int new_y = 0;
             int old_x = (int)position.X + radius;
             int old_y = (int)position.Y;
-            float step = (MathF.PI * 2) / 32;
+            float step = (MathF.PI * 2) / 15;
 
             SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 

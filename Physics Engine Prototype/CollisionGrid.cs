@@ -8,6 +8,9 @@ namespace Physics_Engine
         Vector2 TopLeftCell;
         Vector2 BottomRightCell;
         public float cellSize;
+        public uint xCells;
+        public uint yCells;
+
 
         public List<List<CollisionCell>> collisionCells = new List<List<CollisionCell>>();
 
@@ -17,8 +20,8 @@ namespace Physics_Engine
             BottomRightCell = _BottomRightCell;
             cellSize = _CellSize;
 
-            int xCells = (int)((BottomRightCell.X - TopLeftCell.X) / cellSize);
-            int yCells = (int)((BottomRightCell.Y - TopLeftCell.Y) / cellSize);
+            xCells = (uint)((BottomRightCell.X - TopLeftCell.X) / cellSize);
+            yCells = (uint)((BottomRightCell.Y - TopLeftCell.Y) / cellSize);
 
 
             for (int row = 0; row <= xCells; row++)
