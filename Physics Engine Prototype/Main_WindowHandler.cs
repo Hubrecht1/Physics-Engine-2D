@@ -47,7 +47,6 @@ namespace Physics_Engine
                     deltaTime = 0;
                 }
 
-#if DEBUG
                 frameCount++;
                 ulong start = SDL_GetPerformanceCounter();
                 PollEvents();
@@ -84,15 +83,7 @@ namespace Physics_Engine
                     totalPhysicsSecondsElapsed = 0;
                 }
 
-#else
 
-                PollEvents();
-                UpdatePhysics((float)deltaTime);
-                
-                Render();
-
-
-#endif
 
             }
 
@@ -170,28 +161,35 @@ namespace Physics_Engine
 
         static void CreateEntities()
         {
-            List<RB_Box> rB_StaticBoxes = new List<RB_Box>();
-            List<RB_Box> rB_DynamicBoxes = new List<RB_Box>();
-            List<RB_Circle> rB_DynamicCircles = new List<RB_Circle>();
-
-            rB_StaticBoxes.Add(new RB_Box(0, new Vector2(0, windowHeight - 30), windowWidth, 8, 0, 0.5f));
 
 
-            rB_StaticBoxes.Add(new RB_Box(0, new Vector2(0, windowHeight), windowWidth, 8, 0, 0.5f));
+            new RB_Box(0, new Vector2(0, windowHeight - 30), windowWidth, 8, 0, 0.5f); //bottom
 
-            rB_StaticBoxes.Add(new RB_Box(1, new Vector2(0, 0), 8, windowHeight, 0, 1));
+            new RB_Box(0, new Vector2(0, -8), windowWidth, 8, 0, 0.5f); //top
+
+
+            new RB_Box(0, new Vector2(0, windowHeight), windowWidth, 8, 0, 0.5f);
+
+            new RB_Box(1, new Vector2(0, 0), 8, windowHeight, 0, 1);
 
             //random box
-            rB_StaticBoxes.Add(new RB_Box(0, new Vector2(400, windowHeight - 200), 300, 8, 0, 0.5f));
-            rB_StaticBoxes.Add(new RB_Box(0, new Vector2(450, windowHeight - 300), 8, 100, 0, 0.5f));
-            rB_StaticBoxes.Add(new RB_Box(0, new Vector2(250, windowHeight - 300), 8, 100, 0, 0.5f));
+            new RB_Box(0, new Vector2(400, windowHeight - 200), 300, 8, 0, 0.5f);
+            new RB_Box(0, new Vector2(450, windowHeight - 300), 8, 100, 0, 0.5f);
+            new RB_Box(0, new Vector2(250, windowHeight - 300), 8, 100, 0, 0.5f);
 
 
+            new RB_Box(3, new Vector2(windowWidth - 4, 0), 8, windowHeight, 0f);
+
+            new RB_Box(4, new Vector2(200, 50), 60, 60, -1f, 1.0f);
+            //boxes
+
+            new RB_Box(0, new Vector2(200, 250), 200, 50, 0, 0.5f);
+            new RB_Box(0, new Vector2(250, 490), 400, 20, 0, 0.5f);
+
+            new RB_Box(0, new Vector2(400, 400), 50, 100, 0, 0.5f);
+            new RB_Box(0, new Vector2(200, 400), 50, 100, 0, 0.5f);
 
 
-            rB_StaticBoxes.Add(new RB_Box(3, new Vector2(windowWidth - 4, 0), 8, windowHeight, 0f));
-
-            rB_DynamicBoxes.Add(new RB_Box(4, new Vector2(200, 50), 60, 60, -1f, 1.0f));
 
 
         }
@@ -216,8 +214,10 @@ namespace Physics_Engine
 
             if (MouseState == SDL_BUTTON_X1)
             {
-                new RB_Circle(5, new Vector2(x, y), new Random().Next(2, 10), -1, 0.7f, true).GetComponent<RigidBody>().Velocity = new Vector2(new Random().Next(-5, 5), new Random().Next(-5, 5));
+                new RB_Circle(5, new Vector2(x, y), new Random().Next(3, 14), -1, 0.7f, true).GetComponent<RigidBody>().Velocity = new Vector2(new Random().Next(-5, 5), new Random().Next(-5, 5));
+                //new RB_Box(0, new Vector2(x, y), new Random().Next(6, 28), new Random().Next(6, 28), -1, 0.5f, true);
                 numberOfCircles++;
+
             }
 
             // Check to see if there are any events and continue to do so until the queue is empty.

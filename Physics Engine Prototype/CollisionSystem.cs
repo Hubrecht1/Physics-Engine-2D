@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Numerics;
 using static SDL2.SDL;
+using System.Threading.Tasks;
 
 namespace Physics_Engine
 {
     public class CollisionSystem
     {
-        protected static List<CircleCollider> circleColliders = new List<CircleCollider>();
-        protected static List<BoxCollider> boxColliders = new List<BoxCollider>();
+        protected static List<CircleCollider> grid_CircleColliders = new List<CircleCollider>();
+        protected static List<BoxCollider> grid_BoxColliders = new List<BoxCollider>();
 
-        protected static List<CircleCollider> big_CircleColliders = new List<CircleCollider>();
-        protected static List<BoxCollider> big_BoxColliders = new List<BoxCollider>();
+        protected static List<CircleCollider> noGrid_CircleColliders = new List<CircleCollider>();
+        protected static List<BoxCollider> noGrid_BoxColliders = new List<BoxCollider>();
+
+        static List<(int, int)> fullCells = new List<(int, int)>();
 
         static List<Manifold> contactList;
 
@@ -20,20 +23,20 @@ namespace Physics_Engine
 
         public static void Register(CircleCollider circleCollider)
         {
-            circleColliders.Add(circleCollider);
+            grid_CircleColliders.Add(circleCollider);
         }
         public static void Register(BoxCollider boxCollider)
         {
-            boxColliders.Add(boxCollider);
+            grid_BoxColliders.Add(boxCollider);
         }
 
         public static void Initialize()
         {
-            foreach (CircleCollider component in circleColliders)
+            foreach (CircleCollider component in grid_CircleColliders)
             {
                 component.Initialize();
             }
-            foreach (BoxCollider component in boxColliders)
+            foreach (BoxCollider component in grid_BoxColliders)
             {
                 component.Initialize();
             }
@@ -42,18 +45,21 @@ namespace Physics_Engine
 
         public static void Update(float dt)
         {
-            //double secondsElapsed;
+            ////old way:
             //FindAndSolveCollisions(circleColliders, boxColliders);
 
+            //double secondsElapsed;
             //double solving = SDL_GetPerformanceCounter();
 
             collisionGrid = MakeGrid();
             AddCollidersToGrid(collisionGrid);
             SolveGrid(collisionGrid);
+            fullCells.Clear();
             collisionGrid.collisionCells.Clear();
 
             //double solvingend = SDL_GetPerformanceCounter();
             //secondsElapsed = (solvingend - solving) / (double)SDL_GetPerformanceFrequency();
+
 
             //Console.WriteLine("time       " + secondsElapsed * 1000);
         }
@@ -94,8 +100,6 @@ namespace Physics_Engine
             //checks every posible circlevsbox collision
             for (int i = 0; i < _circleColliders.Count; i++)
             {
-
-
                 for (int j = 0; j < _boxColliders.Count; j++)
                 {
                     float penetration = 0f;
@@ -144,6 +148,7 @@ namespace Physics_Engine
                 }
             }
 
+
         }
 
         static void FindAndSolveCollisionsFromCollider(CircleCollider collider, List<CircleCollider> _circleColliders, List<BoxCollider> _boxColliders)
@@ -175,6 +180,9 @@ namespace Physics_Engine
                     PositionalCorrection(collider.rigidBody, _boxColliders[i].rigidBody, collisionNormal, penetration);
                 }
             }
+
+
+
 
         }
 
@@ -224,7 +232,6 @@ namespace Physics_Engine
             {
                 return false;
             }
-
             //collision
 
             float d = n.Length();
@@ -421,31 +428,45 @@ namespace Physics_Engine
 
         static void AddCollidersToGrid(CollisionGrid _collisionGrid)
         {
-            for (int i = 0; i < boxColliders.Count(); i++)
+            for (int i = 0; i < grid_BoxColliders.Count(); i++)
             {
-                if (ColliderFitsIncell(boxColliders[i]))
+                if (ColliderFitsIncell(grid_BoxColliders[i]))
                 {
-                    _collisionGrid.AddColliderToCell(boxColliders[i]);
+                    int x;
+                    int y;
+                    _collisionGrid.AddColliderToCell(grid_BoxColliders[i], out x, out y);
+                    //if (!fullCells.Contains((x, y)))
+                    //{
+                    //    fullCells.Add((x, y));
+
+                    //}
                 }
                 else
                 {
-                    big_BoxColliders.Add(boxColliders[i]);
-                    boxColliders.Remove(boxColliders[i]);
+
+                    noGrid_BoxColliders.Add(grid_BoxColliders[i]);
+                    grid_BoxColliders.Remove(grid_BoxColliders[i]);
                 }
 
             }
 
-            for (int i = 0; i < circleColliders.Count(); i++)
+            for (int i = 0; i < grid_CircleColliders.Count(); i++)
             {
-                if (ColliderFitsIncell(circleColliders[i]))
+                if (ColliderFitsIncell(grid_CircleColliders[i]))
                 {
-                    _collisionGrid.AddColliderToCell(circleColliders[i]);
+                    int y;
+                    int x;
+                    _collisionGrid.AddColliderToCell(grid_CircleColliders[i], out x, out y);
+                    //if (!fullCells.Contains((x, y)))
+                    //{
+                    //    fullCells.Add((x, y));
 
+                    //}
                 }
                 else
                 {
-                    big_CircleColliders.Add(circleColliders[i]);
-                    circleColliders.Remove(circleColliders[i]);
+                    noGrid_CircleColliders.Add(grid_CircleColliders[i]);
+                    grid_CircleColliders.Remove(grid_CircleColliders[i]);
                 }
             }
 
@@ -453,39 +474,24 @@ namespace Physics_Engine
 
         static CollisionGrid MakeGrid()
         {
-            float xMin;
-            float yMin;
-            float xMax;
-            float yMax;
-            if (circleColliders.Count() == 0 && boxColliders.Count() == 0)
+            float xMin, yMin, xMax, yMax;
+            int boxCount = grid_BoxColliders.Count();
+            int circleCount = grid_CircleColliders.Count();
+
+            if (circleCount == 0 && boxCount == 0)
             {
                 return new CollisionGrid(Vector2.One, Vector2.One, cellSize);
             }
-            else if (circleColliders.Count() == 0)
-            {
-                xMin = boxColliders.Min(x => x.rigidBody.entityTransform.position.X);
-                yMin = boxColliders.Min(x => x.rigidBody.entityTransform.position.Y);
-                xMax = boxColliders.Max(x => x.rigidBody.entityTransform.position.X);
-                yMax = boxColliders.Max(x => x.rigidBody.entityTransform.position.Y);
 
+            Func<BoxCollider, float> boxXSelector = x => x.rigidBody.entityTransform.position.X;
+            Func<BoxCollider, float> boxYSelector = y => y.rigidBody.entityTransform.position.Y;
+            Func<CircleCollider, float> circleXSelector = x => x.rigidBody.entityTransform.position.X;
+            Func<CircleCollider, float> circleYSelector = y => y.rigidBody.entityTransform.position.Y;
 
-            }
-            else if (boxColliders.Count() == 0)
-            {
-                xMin = circleColliders.Min(x => x.rigidBody.entityTransform.position.X);
-                yMin = circleColliders.Min(x => x.rigidBody.entityTransform.position.Y);
-                xMax = circleColliders.Max(x => x.rigidBody.entityTransform.position.X);
-                yMax = circleColliders.Max(x => x.rigidBody.entityTransform.position.Y);
-
-            }
-            else
-            {
-                xMin = MathF.Min(boxColliders.Min(x => x.rigidBody.entityTransform.position.X), circleColliders.Min(x => x.rigidBody.entityTransform.position.X));
-                yMin = MathF.Min(boxColliders.Min(x => x.rigidBody.entityTransform.position.Y), circleColliders.Min(x => x.rigidBody.entityTransform.position.Y));
-                xMax = MathF.Max(boxColliders.Max(x => x.rigidBody.entityTransform.position.X), circleColliders.Max(x => x.rigidBody.entityTransform.position.X));
-                yMax = MathF.Max(boxColliders.Max(x => x.rigidBody.entityTransform.position.Y), circleColliders.Max(x => x.rigidBody.entityTransform.position.Y));
-
-            }
+            xMin = boxCount == 0 ? grid_CircleColliders.Min(circleXSelector) : grid_BoxColliders.Min(boxXSelector);
+            yMin = boxCount == 0 ? grid_CircleColliders.Min(circleYSelector) : grid_BoxColliders.Min(boxYSelector);
+            xMax = boxCount == 0 ? grid_CircleColliders.Max(circleXSelector) : grid_BoxColliders.Max(boxXSelector);
+            yMax = boxCount == 0 ? grid_CircleColliders.Max(circleYSelector) : grid_BoxColliders.Max(boxYSelector);
 
             Vector2 topLeft = new Vector2(xMin, yMin);
             Vector2 bottomRight = new Vector2(xMax, yMax);
@@ -494,53 +500,57 @@ namespace Physics_Engine
 
         }
 
+        static void SolveCell(CollisionGrid _collisionGrid, int x, int y)
+        {
+            List<CircleCollider> potentialCircles = getPotentialCircleCollidersFromCell(_collisionGrid, x, y);
+            List<BoxCollider> potentialBoxes = getPotentialBoxCollidersFromCell(_collisionGrid, x, y);
+
+            foreach (CircleCollider circle in _collisionGrid.collisionCells[x][y].circleColliders)
+            {
+                FindAndSolveCollisionsFromCollider(circle, potentialCircles, potentialBoxes);
+            }
+            foreach (BoxCollider box in _collisionGrid.collisionCells[x][y].boxColliders)
+            {
+                FindAndSolveCollisionsFromCollider(box, potentialCircles, potentialBoxes);
+            }
+
+            _collisionGrid.collisionCells[x][y].boxColliders.Clear();
+            _collisionGrid.collisionCells[x][y].circleColliders.Clear();
+        }
+
+
+
+
         static void SolveGrid(CollisionGrid _collisionGrid)
         {
+            //for (int i = 0; i < fullCells.Count(); i++)
+            //{
+            //    SolveCell(_collisionGrid, fullCells[i].Item1, fullCells[i].Item2);
+            //}
+
+
 
             for (int i = 0; i < _collisionGrid.collisionCells.Count; i++)
             {
                 for (int j = 0; j < _collisionGrid.collisionCells[0].Count; j++)
                 {
                     if (_collisionGrid.collisionCells[i][j].circleColliders.Count == 0 && _collisionGrid.collisionCells[i][j].boxColliders.Count == 0) { continue; }
-
-
-                    List<CircleCollider> potentialCircles = getPotentialCircleCollidersFromCell(_collisionGrid, i, j);
-                    List<BoxCollider> potentialBoxes = getPotentialBoxCollidersFromCell(_collisionGrid, i, j);
-
-                    foreach (CircleCollider circle in _collisionGrid.collisionCells[i][j].circleColliders)
-                    {
-                        FindAndSolveCollisionsFromCollider(circle, potentialCircles, potentialBoxes);
-                    }
-                    foreach (BoxCollider box in _collisionGrid.collisionCells[i][j].boxColliders)
-                    {
-                        FindAndSolveCollisionsFromCollider(box, potentialCircles, potentialBoxes);
-                    }
-
-                    _collisionGrid.collisionCells[i][j].boxColliders.Clear();
-                    _collisionGrid.collisionCells[i][j].circleColliders.Clear();
-
-
+                    SolveCell(_collisionGrid, i, j);
 
                 }
             }
 
-            foreach (BoxCollider bigBox in big_BoxColliders)
+            foreach (BoxCollider bigBox in noGrid_BoxColliders)
             {
-                FindAndSolveCollisionsFromCollider(bigBox, circleColliders, boxColliders);
-
-
+                FindAndSolveCollisionsFromCollider(bigBox, grid_CircleColliders, grid_BoxColliders);
             }
-            foreach (CircleCollider bigCircle in big_CircleColliders)
+            foreach (CircleCollider bigCircle in noGrid_CircleColliders)
             {
-                FindAndSolveCollisionsFromCollider(bigCircle, circleColliders, boxColliders);
-
-
+                FindAndSolveCollisionsFromCollider(bigCircle, grid_CircleColliders, grid_BoxColliders);
 
             }
 
-            FindAndSolveCollisions(big_CircleColliders, big_BoxColliders);
-
-
+            FindAndSolveCollisions(noGrid_CircleColliders, noGrid_BoxColliders);
 
 
         }

@@ -5,6 +5,7 @@ namespace Physics_Engine
 {
     public class RigidBody : Component
     {
+
         public Transform entityTransform;
         public Vector2 Velocity = Vector2.Zero;
         public float inv_mass;

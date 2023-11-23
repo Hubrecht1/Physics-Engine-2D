@@ -11,7 +11,6 @@ namespace Physics_Engine
         public uint xCells;
         public uint yCells;
 
-
         public List<List<CollisionCell>> collisionCells = new List<List<CollisionCell>>();
 
         public CollisionGrid(Vector2 _TopLeftCell, Vector2 _BottomRightCell, float _CellSize)
@@ -31,10 +30,10 @@ namespace Physics_Engine
                 {
                     // Initialize each cell in the row
                     rowList.Add(new CollisionCell());
+
                 }
                 collisionCells.Add(rowList);
             }
-
 
         }
 
@@ -46,17 +45,22 @@ namespace Physics_Engine
             return new Vector2(x, y);
         }
 
-        public void AddColliderToCell(BoxCollider boxCollider)
+        public void AddColliderToCell(BoxCollider boxCollider, out int x, out int y)
         {
             Vector2 cellCoor = GetCellCoordinate(boxCollider.rigidBody.entityTransform.position);
-            collisionCells[(int)cellCoor.X][(int)cellCoor.Y].boxColliders.Add(boxCollider);
+            x = (int)cellCoor.X;
+            y = (int)cellCoor.Y;
+            collisionCells[x][y].boxColliders.Add(boxCollider);
+
 
         }
 
-        public void AddColliderToCell(CircleCollider circleCollider)
+        public void AddColliderToCell(CircleCollider circleCollider, out int x, out int y)
         {
             Vector2 cellCoor = GetCellCoordinate(circleCollider.rigidBody.entityTransform.position);
-            collisionCells[(int)cellCoor.X][(int)cellCoor.Y].circleColliders.Add(circleCollider);
+            x = (int)cellCoor.X;
+            y = (int)cellCoor.Y;
+            collisionCells[x][y].circleColliders.Add(circleCollider);
 
         }
 
@@ -77,11 +81,15 @@ namespace Physics_Engine
 
     public struct CollisionCell
     {
-        public List<BoxCollider> boxColliders = new List<BoxCollider>();
-        public List<CircleCollider> circleColliders = new List<CircleCollider>();
+        public List<BoxCollider> boxColliders;
+        public List<CircleCollider> circleColliders;
 
         public CollisionCell()
         {
+            boxColliders = new List<BoxCollider>();
+            circleColliders = new List<CircleCollider>();
+
+
         }
     }
 }
