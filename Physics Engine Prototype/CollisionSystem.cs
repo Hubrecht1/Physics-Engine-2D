@@ -207,7 +207,6 @@ namespace Physics_Engine
 
             float impulseMagnitude = -1 * (1 + e) * velAlongNormal;
 
-
             float total_inv_Mass = A.inv_mass + B.inv_mass;
 
             Vector2 impulse = (impulseMagnitude / total_inv_Mass) * normal;
@@ -216,7 +215,6 @@ namespace Physics_Engine
             A.Velocity -= A.inv_mass * impulse;
 
             B.Velocity += B.inv_mass * impulse;
-
 
         }
 
@@ -322,11 +320,8 @@ namespace Physics_Engine
         {
             Vector2 circlePosition = A.rigidBody.entityTransform.position;
             Vector2 boxPosition = B.rigidBody.entityTransform.position;
-
             Vector2 boxCenter = boxPosition + new Vector2(B.width / 2, B.height / 2);
-
-            Vector2 n = boxCenter - circlePosition;
-
+            Vector2 n = boxCenter - circlePosition; //distance circle and box
             Vector2 closest = n;
 
             float xExtent = B.width / 2;

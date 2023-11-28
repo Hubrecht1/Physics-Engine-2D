@@ -28,7 +28,6 @@ namespace Physics_Engine
 
         static uint numberOfCircles = 0;
 
-
         //main loop
         static void Main(string[] args)
         {
@@ -37,6 +36,7 @@ namespace Physics_Engine
 
             while (running)
             {
+                // Update update
 
                 LAST = NOW;
                 NOW = SDL_GetPerformanceCounter();
@@ -168,9 +168,11 @@ namespace Physics_Engine
             new RB_Box(0, new Vector2(0, -8), windowWidth, 8, 0, 0.5f); //top
 
 
-            new RB_Box(0, new Vector2(0, windowHeight), windowWidth, 8, 0, 0.5f);
+            new RB_Box(0, new Vector2(0, windowHeight), windowWidth, 8, 0, 0.5f); //left
 
-            new RB_Box(1, new Vector2(0, 0), 8, windowHeight, 0, 1);
+            new RB_Box(1, new Vector2(0, 0), 8, windowHeight, 0, 1); //right
+
+            new RB_Box(3, new Vector2(windowWidth - 4, 0), 8, windowHeight, 0f);
 
             //random box
             new RB_Box(0, new Vector2(400, windowHeight - 200), 300, 8, 0, 0.5f);
@@ -178,7 +180,6 @@ namespace Physics_Engine
             new RB_Box(0, new Vector2(250, windowHeight - 300), 8, 100, 0, 0.5f);
 
 
-            new RB_Box(3, new Vector2(windowWidth - 4, 0), 8, windowHeight, 0f);
 
             new RB_Box(4, new Vector2(200, 50), 60, 60, -1f, 1.0f);
             //boxes
@@ -263,24 +264,25 @@ namespace Physics_Engine
 
         }
 
-        static void UpdatePhysics(float dt)
+        static void UpdatePhysics(float dt) //dt = deltatime
         {
             accumulator += dt;
 
+            //updates every frame
             while (accumulator >= inv_PhysicsTPS)
             {
-                float fixedTimeStepFloat = (float)inv_PhysicsTPS;
+                //tps = ticks per second
+                float fixedTimeStepFloat = (float)inv_PhysicsTPS; // inv_PhysicsTPS = 1 / tps 
 
-                // Update update
                 CollisionSystem.Update(fixedTimeStepFloat);
                 RigidBodySystem.Update(fixedTimeStepFloat);
 
                 accumulator -= inv_PhysicsTPS;
 
-
             }
 
         }
+
         /// <summary>
         /// Renders to the window.
         /// </summary>
