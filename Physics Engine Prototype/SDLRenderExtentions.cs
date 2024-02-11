@@ -16,7 +16,7 @@ namespace Physics_Engine
             int new_y = 0;
             int old_x = (int)position.X + radius;
             int old_y = (int)position.Y;
-            uint numberOfLines = 15;
+            uint numberOfLines = 30;
             float step = (MathF.PI * 2) / numberOfLines;
 
             SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);

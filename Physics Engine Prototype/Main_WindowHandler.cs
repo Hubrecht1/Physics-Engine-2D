@@ -83,13 +83,10 @@ namespace Physics_Engine
                     totalPhysicsSecondsElapsed = 0;
                 }
 
-
-
             }
 
             CleanUp();
         }
-
 
         static void UpdateSystems() //this funtion is called every frame
         {
@@ -99,9 +96,7 @@ namespace Physics_Engine
             ScreenRectangleSystem.Update(dt);
             ScreenCircleSystem.Update(dt);
 
-
         }
-
 
         /// <summary>
         /// Setup all of the SDL resources we'll need to display a window.
@@ -175,20 +170,16 @@ namespace Physics_Engine
             new RB_Box(3, new Vector2(windowWidth - 4, 0), 8, windowHeight, 0f);
 
             //random box
-            new RB_Box(0, new Vector2(400, windowHeight - 200), 300, 8, 0, 0.5f);
-            new RB_Box(0, new Vector2(450, windowHeight - 300), 8, 100, 0, 0.5f);
-            new RB_Box(0, new Vector2(250, windowHeight - 300), 8, 100, 0, 0.5f);
-
-
-
-            new RB_Box(4, new Vector2(200, 50), 60, 60, -1f, 1.0f);
-            //boxes
+            //new RB_Box(0, new Vector2(400, windowHeight - 200), 300, 8, 0, 0.5f);
+            //new RB_Box(0, new Vector2(450, windowHeight - 300), 8, 100, 0, 0.5f);
+            //new RB_Box(0, new Vector2(250, windowHeight - 300), 8, 100, 0, 0.5f);
+            //new RB_Box(4, new Vector2(200, 50), 60, 60, -1f, 1.0f);
 
             new RB_Box(0, new Vector2(200, 250), 200, 50, 0, 0.5f);
-            new RB_Box(0, new Vector2(250, 490), 400, 20, 0, 0.5f);
+            //new RB_Box(0, new Vector2(250, 490), 400, 20, 0, 0.5f);
 
-            new RB_Box(0, new Vector2(400, 400), 50, 100, 0, 0.5f);
-            new RB_Box(0, new Vector2(200, 400), 50, 100, 0, 0.5f);
+            //new RB_Box(0, new Vector2(400, 400), 50, 100, 0, 0.5f);
+            //new RB_Box(0, new Vector2(200, 400), 50, 100, 0, 0.5f);
 
 
 
@@ -215,8 +206,8 @@ namespace Physics_Engine
 
             if (MouseState == SDL_BUTTON_X1)
             {
-                new RB_Circle(5, new Vector2(x, y), new Random().Next(3, 14), -1, 0.7f, true).GetComponent<RigidBody>().Velocity = new Vector2(new Random().Next(-5, 5), new Random().Next(-5, 5));
-                //new RB_Box(0, new Vector2(x, y), new Random().Next(6, 28), new Random().Next(6, 28), -1, 0.5f, true);
+                new RB_Circle(5, new Vector2(x, y), new Random().Next(4, 20), -1, 0.7f, true).GetComponent<RigidBody>().Velocity = new Vector2(new Random().Next(-5, 5), new Random().Next(-5, 5));
+
                 numberOfCircles++;
 
             }
@@ -228,6 +219,10 @@ namespace Physics_Engine
                 {
                     case SDL_EventType.SDL_QUIT:
                         running = false;
+                        break;
+                    case SDL_EventType.SDL_MOUSEBUTTONDOWN:
+                        //new RB_Circle(5, new Vector2(x, y), new Random().Next(20, 40), -1, 0.7f, true).GetComponent<RigidBody>().Velocity = new Vector2(new Random().Next(-5, 5), new Random().Next(-5, 5));
+                        //numberOfCircles++;
                         break;
                     case SDL_EventType.SDL_KEYDOWN:
                         if (e.key.keysym.sym == SDL_Keycode.SDLK_ESCAPE)

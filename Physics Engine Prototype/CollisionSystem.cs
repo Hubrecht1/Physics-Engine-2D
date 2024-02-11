@@ -19,7 +19,7 @@ namespace Physics_Engine
 
         static CollisionGrid collisionGrid;
 
-        static int cellSize = 30;
+        static int cellSize = 60;
 
         public static void Register(CircleCollider circleCollider)
         {
@@ -622,15 +622,7 @@ namespace Physics_Engine
 
 
 
-
-
-
-
-
-
     }
-
-
 
 
 
